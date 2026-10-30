@@ -1,9 +1,29 @@
 import { useState } from 'react'
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { BarChart3, BookOpen, Database, GitCompare, HeartHandshake, LayoutDashboard, LogOut, Menu, Route as RouteIcon, Settings2, Soup, Sparkles, User, X } from 'lucide-react'
+import {
+  ArrowRight,
+  BarChart3,
+  BookOpen,
+  CheckCircle2,
+  Database,
+  GitCompare,
+  HeartHandshake,
+  HelpCircle,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  Route as RouteIcon,
+  Settings2,
+  Soup,
+  Sparkles,
+  Truck,
+  User,
+  X,
+  Zap,
+} from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import { homeFor } from '../lib/utils'
-import { Toaster } from './ui'
+import { Modal, Toaster } from './ui'
 
 const LINKS = {
   donor: [
@@ -43,6 +63,8 @@ export default function Layout() {
   const { user, signIn, signOut, live, mode, switchMode, toast } = useApp()
   const nav = useNavigate()
   const [open, setOpen] = useState(false)
+  const [guideOpen, setGuideOpen] = useState(false)
+
   const links = [
     ...(user ? LINKS[user.role] || [] : []),
     { to: '/how-it-works', label: 'How It Works', icon: BookOpen },
@@ -98,10 +120,20 @@ export default function Layout() {
 
           {/* Right Action Area */}
           <div className="ml-auto flex items-center gap-2.5">
-            {/* Quick Demo Persona Switcher (Crucial for live demonstrations) */}
+            {/* Quick Demo Tour Help Pill */}
+            <button
+              type="button"
+              onClick={() => setGuideOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-300/80 bg-emerald-50/80 px-2.5 py-1.5 text-xs font-bold text-emerald-800 hover:bg-emerald-100 transition shadow-sm"
+              title="Open quick 60-second evaluation guide"
+            >
+              <Sparkles className="h-3.5 w-3.5 text-emerald-600" />
+              <span className="hidden md:inline">Quick Tour</span>
+            </button>
+
+            {/* Quick Demo Persona Switcher */}
             <div className="hidden xl:flex items-center gap-1 rounded-xl border border-slate-200 bg-slate-50/80 p-1 text-[11px] font-semibold">
               <span className="text-ink-mute px-1.5 flex items-center gap-1">
-                <Sparkles className="h-3 w-3 text-leaf-700" />
                 <span>Demo Role:</span>
               </span>
               <button
@@ -218,6 +250,50 @@ export default function Layout() {
                 <option value="live">Live API</option>
               </select>
             </div>
+
+            {/* Mobile Demo Persona Switcher */}
+            <div className="mb-3 flex items-center justify-between rounded-xl bg-slate-50 p-2 text-xs">
+              <span className="font-bold text-ink-soft">Switch Demo Role:</span>
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpen(false)
+                    switchDemoPersona('admin')
+                  }}
+                  className={`rounded-lg px-2.5 py-1 text-xs font-semibold ${
+                    user?.role === 'admin' ? 'bg-leaf-700 text-white' : 'bg-white border text-ink'
+                  }`}
+                >
+                  Admin
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpen(false)
+                    switchDemoPersona('donor')
+                  }}
+                  className={`rounded-lg px-2.5 py-1 text-xs font-semibold ${
+                    user?.role === 'donor' ? 'bg-leaf-700 text-white' : 'bg-white border text-ink'
+                  }`}
+                >
+                  Donor
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpen(false)
+                    switchDemoPersona('receiver')
+                  }}
+                  className={`rounded-lg px-2.5 py-1 text-xs font-semibold ${
+                    user?.role === 'receiver' ? 'bg-leaf-700 text-white' : 'bg-white border text-ink'
+                  }`}
+                >
+                  Shelter
+                </button>
+              </div>
+            </div>
+
             <nav className="grid gap-1.5" aria-label="Mobile Navigation">
               {links.map((l) => (
                 <NavLink
@@ -259,18 +335,74 @@ export default function Layout() {
         <Outlet />
       </main>
 
+      {/* Evaluator Quick Tour Modal */}
+      <Modal
+        open={guideOpen}
+        onClose={() => setGuideOpen(false)}
+        title="Quick Evaluator Tour (60 Seconds)"
+        footer={
+          <button
+            className="btn-primary w-full"
+            onClick={() => {
+              setGuideOpen(false)
+              switchDemoPersona('admin')
+            }}
+          >
+            Launch Admin Operations Center
+          </button>
+        }
+      >
+        <div className="space-y-4 text-xs sm:text-sm">
+          <p className="text-ink-soft leading-relaxed">
+            Welcome to SmartFeed! Follow this 3-step walkthrough to test the urgency scoring, split lot matching, and multi-depot vehicle routing in real time:
+          </p>
+
+          <div className="space-y-3">
+            <div className="flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50/60 p-3">
+              <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-emerald-600 font-bold text-white text-xs">1</span>
+              <div>
+                <b className="text-emerald-950 block">Operations Center</b>
+                <span className="text-emerald-900 leading-snug">
+                  Click <b>"1-Click Auto-Dispatch"</b>. Watch the platform match 10 donors to 10 shelters and route vehicles across Bangalore multi-depots in &lt;1s.
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 rounded-xl border border-blue-200 bg-blue-50/60 p-3">
+              <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-blue-600 font-bold text-white text-xs">2</span>
+              <div>
+                <b className="text-blue-950 block">SmartFeed vs Baseline Comparison</b>
+                <span className="text-blue-900 leading-snug">
+                  Go to <b>Compare</b> to inspect side-by-side results. Notice how the naive proximity system had <b>140+ kg food wasted & late arrivals</b>, while SmartFeed achieved <b>0 kg wasted</b>.
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50/60 p-3">
+              <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-amber-600 font-bold text-white text-xs">3</span>
+              <div>
+                <b className="text-amber-950 block">Routes & Timelines</b>
+                <span className="text-amber-900 leading-snug">
+                  View turn-by-turn driver manifests, vehicle cargo loads, and click <b>Print / Download PDF</b> for driver delivery sheets.
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Modal>
+
       {/* Modern, Clean Footer */}
       <footer className="no-print mt-auto border-t border-slate-200 bg-white py-8 text-center text-xs text-ink-soft">
         <div className="mx-auto max-w-7xl px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <span className="font-bold text-ink">SmartFeed</span>
             <span className="text-slate-300">·</span>
-            <span>Intelligent food rescue logistics</span>
+            <span>Intelligent food rescue logistics for Bangalore</span>
           </div>
           <div className="flex items-center gap-5 text-ink-soft">
             <Link to="/how-it-works" className="hover:text-leaf-800 transition">How it works</Link>
             <Link to="/admin/compare" className="hover:text-leaf-800 transition">Old vs New Way</Link>
-            <span className="text-leaf-700 font-medium">Every kilogram to a plate, not a landfill.</span>
+            <span className="text-leaf-700 font-semibold">Every kilogram to a plate, not a landfill.</span>
           </div>
         </div>
       </footer>

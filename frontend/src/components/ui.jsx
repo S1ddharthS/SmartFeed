@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { AlertTriangle, CheckCircle2, Clock, HelpCircle, Inbox, Loader2, Sparkles, X, XCircle } from 'lucide-react'
 import { countdown, statusStyle, urgencyLevel } from '../lib/utils'
 import { useApp } from '../context/AppContext'
@@ -274,6 +274,181 @@ export function InfoCallout({ title, children, tone = 'leaf', icon: Icon = Spark
       <div className="flex-1">
         {title && <div className="font-semibold mb-0.5">{title}</div>}
         <div className="opacity-90 leading-relaxed">{children}</div>
+      </div>
+    </div>
+  )
+}
+
+export function SkeletonCard() {
+  return (
+    <div className="card p-5 space-y-3">
+      <div className="flex items-center justify-between">
+        <div className="h-4 w-28 rounded shimmer" />
+        <div className="h-8 w-8 rounded-xl shimmer" />
+      </div>
+      <div className="h-7 w-20 rounded shimmer" />
+      <div className="h-3 w-40 rounded shimmer" />
+    </div>
+  )
+}
+
+export function SkeletonRow() {
+  return (
+    <div className="flex items-center justify-between py-3 border-b border-slate-100 gap-4">
+      <div className="h-4 w-1/3 rounded shimmer" />
+      <div className="h-4 w-1/4 rounded shimmer" />
+      <div className="h-6 w-16 rounded-full shimmer" />
+    </div>
+  )
+}
+
+export function UrgencySandbox() {
+  const [hoursLeft, setHoursLeft] = useState(2.5)
+  const [foodType, setFoodType] = useState('cooked')
+  const [needSeverity, setNeedSeverity] = useState(4)
+
+  // Calculate dynamic urgency score (0 to 1)
+  const decayFactor = Math.max(0.05, Math.min(1, Math.exp(-hoursLeft / 5)))
+  const perishMultiplier = { cooked: 1.0, bakery: 0.85, produce: 0.7, dry: 0.4 }[foodType]
+  const hungerWeight = needSeverity / 5
+  const rawScore = decayFactor * 0.55 * perishMultiplier + hungerWeight * 0.45
+  const score = Math.max(0.1, Math.min(0.99, Number(rawScore.toFixed(2))))
+
+  const u = urgencyLevel(score)
+
+  return (
+    <div className="card overflow-hidden border-leaf-200 bg-gradient-to-br from-white via-emerald-50/30 to-leaf-50/50 p-6 shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/60 pb-4 mb-5">
+        <div>
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-leaf-700" />
+            <h3 className="font-display text-base sm:text-lg font-bold text-ink">
+              Interactive Urgency Engine Preview
+            </h3>
+          </div>
+          <p className="text-xs text-ink-soft mt-0.5">
+            Test how SmartFeed mathematically scores every food donation in real time.
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <UrgencyBadge score={score} showScore={true} />
+        </div>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <div className="space-y-4">
+          <div>
+            <div className="flex justify-between text-xs font-semibold text-ink mb-1">
+              <span>Hours Until Spoilage</span>
+              <span className="font-bold text-leaf-800">{hoursLeft} hrs</span>
+            </div>
+            <input
+              type="range"
+              min="0.5"
+              max="24"
+              step="0.5"
+              value={hoursLeft}
+              onChange={(e) => setHoursLeft(Number(e.target.value))}
+              className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-slate-200 accent-leaf-600 focus:outline-none"
+            />
+            <div className="flex justify-between text-[10px] text-ink-mute mt-1">
+              <span>30 mins (Critical)</span>
+              <span>12 hrs</span>
+              <span>24 hrs (Stable)</span>
+            </div>
+          </div>
+
+          <div>
+            <label className="text-xs font-semibold text-ink mb-1.5 block">Surplus Food Type</label>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              {[
+                { id: 'cooked', label: '🍛 Cooked Meals', sub: 'Perishable (4h)' },
+                { id: 'bakery', label: '🥐 Bakery / Breads', sub: 'Semi-fresh (12h)' },
+                { id: 'produce', label: '🍎 Fresh Produce', sub: 'Raw goods (36h)' },
+                { id: 'dry', label: '📦 Packaged / Dry', sub: 'Long shelf-life (72h)' },
+              ].map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setFoodType(item.id)}
+                  className={`rounded-xl border p-2 text-left transition ${
+                    foodType === item.id
+                      ? 'border-leaf-600 bg-leaf-50 text-leaf-950 font-semibold ring-1 ring-leaf-600'
+                      : 'border-slate-200 bg-white text-ink-soft hover:bg-slate-50'
+                  }`}
+                >
+                  <div>{item.label}</div>
+                  <div className="text-[10px] text-ink-mute">{item.sub}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <div className="flex justify-between text-xs font-semibold text-ink mb-1">
+              <span>Shelter Hunger Emergency Level</span>
+              <span className="font-bold text-rose-700">{needSeverity} / 5</span>
+            </div>
+            <div className="grid grid-cols-5 gap-1.5 text-center text-xs">
+              {[1, 2, 3, 4, 5].map((lvl) => (
+                <button
+                  key={lvl}
+                  type="button"
+                  onClick={() => setNeedSeverity(lvl)}
+                  className={`rounded-lg py-1.5 font-bold transition ${
+                    needSeverity === lvl
+                      ? 'bg-rose-600 text-white shadow-sm'
+                      : 'bg-slate-100 text-ink-soft hover:bg-slate-200'
+                  }`}
+                >
+                  {lvl}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
+          <div>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-ink-mute">Real-Time Dispatch Verdict</span>
+            <div className="mt-2 flex items-baseline gap-3">
+              <span className="font-display text-4xl font-extrabold text-ink font-mono">
+                {score.toFixed(2)}
+              </span>
+              <div className="text-xs">
+                <span className={`inline-block font-bold ${score >= 0.7 ? 'text-rose-600' : score >= 0.4 ? 'text-amber-600' : 'text-emerald-600'}`}>
+                  {score >= 0.7 ? 'CRITICAL DISPATCH PRIORITY' : score >= 0.4 ? 'MODERATE PRIORITY' : 'ROUTINE DISPATCH'}
+                </span>
+                <p className="text-[11px] text-ink-soft">Calculated priority in live matching queue</p>
+              </div>
+            </div>
+
+            <div className="mt-4 space-y-2 text-xs">
+              <div className="flex items-center justify-between rounded-lg bg-slate-50 p-2 text-ink-soft">
+                <span>Perishability Penalty:</span>
+                <span className="font-semibold text-ink">{(decayFactor * perishMultiplier).toFixed(2)}x weight</span>
+              </div>
+              <div className="flex items-center justify-between rounded-lg bg-slate-50 p-2 text-ink-soft">
+                <span>Recipient Need Weight:</span>
+                <span className="font-semibold text-ink">{(hungerWeight * 100).toFixed(0)}% severity</span>
+              </div>
+              <div className="flex items-center justify-between rounded-lg bg-slate-50 p-2 text-ink-soft">
+                <span>Algorithm Decision:</span>
+                <span className="font-semibold text-leaf-800">
+                  {score >= 0.7
+                    ? 'Dispatched to Nearest Multi-Depot EV'
+                    : score >= 0.4
+                    ? 'Batched with Mid-Day Urban Route'
+                    : 'Queued with Standard Evening Collection'}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4 rounded-xl border border-leaf-200 bg-leaf-50/70 p-3 text-[11px] text-leaf-900 leading-snug">
+            💡 <b>Why this matters:</b> Unlike traditional apps that blindly serve whoever posted first, SmartFeed ensures hot cooked food nearing its 4h window is automatically routed ahead of dry non-perishables.
+          </div>
+        </div>
       </div>
     </div>
   )

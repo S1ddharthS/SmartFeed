@@ -1,5 +1,5 @@
 import { ArrowRight, Boxes, Building2, CheckCircle2, Clock, Hourglass, Layers, Scale, ShieldCheck, Sparkles, Split, Zap } from 'lucide-react'
-import { PageHeader } from '../components/ui'
+import { PageHeader, UrgencySandbox } from '../components/ui'
 
 const Formula = ({ title, desc, rows }) => (
   <div className="card p-6 border-slate-200/90 shadow-sm flex flex-col justify-between">
@@ -118,6 +118,14 @@ export default function HowItWorks() {
             ]}
           />
         </div>
+      </div>
+
+      {/* Interactive Simulator Sandbox */}
+      <div>
+        <div className="text-xs font-bold uppercase tracking-wider text-ink-mute mb-3">
+          Interactive Parameter Sandbox
+        </div>
+        <UrgencySandbox />
       </div>
 
       {/* Color Language Reference */}
