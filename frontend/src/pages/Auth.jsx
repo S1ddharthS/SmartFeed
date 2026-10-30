@@ -155,7 +155,7 @@ export function Login() {
                 <div className="mt-2 flex items-center justify-between text-[11px] text-brand-600 font-medium">
                   <span>{d.tag}</span>
                   <span className="inline-flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
-                    Enter Dashboard <ArrowRight className="h-3 w-3" />
+                    Dashboard <ArrowRight className="h-3 w-3" />
                   </span>
                 </div>
               </button>
@@ -283,7 +283,7 @@ export function Register() {
       )}
 
       <Button className="btn-primary w-full !py-2.5 text-sm" loading={busy} type="submit">
-        Create Account
+        Sign Up
       </Button>
 
       <p className="text-center text-xs text-ink-soft pt-1">

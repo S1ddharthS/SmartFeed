@@ -63,7 +63,7 @@ export default function Analytics() {
             <div className="flex flex-wrap items-center justify-center gap-2">
               <Button className="btn-primary" loading={busy} onClick={runPipelineNow}>
                 <Zap className="h-4 w-4" />
-                <span>Run Optimization Simulation</span>
+                <span>Plan Routes</span>
               </Button>
               <Link to="/admin" className="btn-secondary">
                 Control Center

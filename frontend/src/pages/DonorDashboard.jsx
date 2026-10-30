@@ -1,6 +1,18 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, CheckCircle2, Clock, MapPin, Package, Plus, Scale, Soup, Sparkles, Trash2, Utensils } from 'lucide-react'
+import {
+  ArrowRight,
+  CheckCircle2,
+  Clock,
+  MapPin,
+  Package,
+  Plus,
+  Scale,
+  Soup,
+  Sparkles,
+  Trash2,
+  Utensils,
+} from 'lucide-react'
 import { api } from '../api/client'
 import { isMine, useApp } from '../context/AppContext'
 import { useAsync } from '../lib/useAsync'
@@ -40,14 +52,14 @@ export default function DonorDashboard() {
   if (error) return <ErrorState message={error} onRetry={reload} />
 
   const { donations, scores, matches } = data
-  const total = donations.reduce((s, d) => s + d.quantity_kg, 0)
-  const placed = donations.reduce((s, d) => s + (d.quantity_kg - d.remaining_kg), 0)
+  const totalKg = donations.reduce((s, d) => s + d.quantity_kg, 0)
+  const placedKg = donations.reduce((s, d) => s + (d.quantity_kg - (d.remaining_kg ?? 0)), 0)
 
   const remove = async () => {
     setBusy(true)
     try {
       await api.deleteDonation(del.id)
-      toast('Donation listing removed')
+      toast('Donation listing deleted')
       setDel(null)
       reload()
     } catch (e) {
@@ -60,11 +72,11 @@ export default function DonorDashboard() {
   return (
     <div className="space-y-6 animate-fade-in">
       <PageHeader
-        title="Food Donor Portal"
+        title="Donor Dashboard"
         subtitle={`Track surplus batches, pickup schedules, and matched shelters for ${user.username}.`}
         badge={
           <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 border border-brand-100 px-2.5 py-0.5 text-xs font-semibold text-brand-700">
-            <Sparkles className="h-3 w-3 text-brand-500" /> Donor Workspace
+            <Sparkles className="h-3 w-3 text-brand-500" /> Donor Portal
           </span>
         }
         actions={
@@ -75,36 +87,36 @@ export default function DonorDashboard() {
         }
       />
 
-      {/* Donor Overview Metrics */}
+      {/* 3 Simple Overview Metrics */}
       <div className="grid gap-3 sm:gap-4 sm:grid-cols-3">
         <StatCard
           icon={Scale}
-          label="Total Surplus Offered"
-          value={fmtKg(total)}
-          hint="Aggregate volume registered"
+          label="Total Food Donated"
+          value={fmtKg(totalKg)}
+          hint={`${donations.length} total surplus listings`}
           tone="leaf"
         />
         <StatCard
           icon={Soup}
           label="Matched to Shelters"
-          value={fmtKg(placed)}
-          hint={total > 0 ? `${Math.round((placed / total) * 100)}% allocation rate` : 'Awaiting surplus batch'}
+          value={fmtKg(placedKg)}
+          hint={totalKg > 0 ? `${Math.round((placedKg / totalKg) * 100)}% delivered to shelters` : 'No active listings'}
           tone="blue"
         />
         <StatCard
           icon={Utensils}
-          label="Meals Made Possible"
-          value={mealsFromKg(placed).toLocaleString()}
-          hint="Estimated at ~400g per meal"
+          label="Estimated Meals"
+          value={mealsFromKg(placedKg).toLocaleString()}
+          hint="Calculated at ~400g per meal"
           tone="amber"
         />
       </div>
 
-      {/* Active Donation Batches */}
+      {/* Active Donations */}
       {!donations.length ? (
         <EmptyState
-          title="No food donations posted yet"
-          text="List your surplus cooked meals, bakery products, or fresh produce to match with local shelters."
+          title="No donations yet"
+          text="List your surplus food to automatically match with local shelters in need."
           icon={Package}
           action={
             <Link to="/donor/donate" className="btn-primary">
@@ -116,13 +128,13 @@ export default function DonorDashboard() {
       ) : (
         <div className="space-y-3">
           <div className="flex items-center justify-between text-xs font-medium text-ink-soft">
-            <span>Active Listings ({donations.length})</span>
+            <span>Your Donations ({donations.length})</span>
             <span>Live status</span>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
             {donations.map((d) => {
-              const my = matches.filter((m) => m.donation_id === d.id)
+              const myMatches = matches.filter((m) => m.donation_id === d.id)
               const score = scores[d.id]
 
               return (
@@ -140,7 +152,7 @@ export default function DonorDashboard() {
                       <StatusPill status={d.status} />
                     </div>
 
-                    {/* Volume & Badges */}
+                    {/* Volume & Urgency Badges */}
                     <div className="flex flex-wrap items-center gap-1.5">
                       <span className="rounded bg-slate-100 px-2 py-0.5 text-xs font-semibold text-ink">
                         {fmtKg(d.quantity_kg)}
@@ -167,15 +179,15 @@ export default function DonorDashboard() {
                       </div>
                     </div>
 
-                    {/* Matched Recipients */}
-                    {my.length > 0 && (
+                    {/* Matched Shelters */}
+                    {myMatches.length > 0 && (
                       <div className="rounded-lg border border-brand-100 bg-brand-50/50 p-3 text-xs">
                         <div className="font-semibold text-brand-800 mb-1 flex items-center gap-1.5">
                           <CheckCircle2 className="h-3.5 w-3.5 text-brand-600" />
-                          <span>Assigned Shelters:</span>
+                          <span>Matched Shelters:</span>
                         </div>
                         <ul className="space-y-1">
-                          {my.map((m) => (
+                          {myMatches.map((m) => (
                             <li key={m.match_id} className="flex items-center justify-between text-ink">
                               <span>{m.receiver_name}</span>
                               <span className="font-semibold text-brand-700">{fmtKg(m.allocated_kg)}</span>
@@ -192,7 +204,7 @@ export default function DonorDashboard() {
                     <button
                       className="btn-danger !py-1 !px-2.5 text-xs"
                       onClick={() => setDel(d)}
-                      title="Remove this listing"
+                      title="Delete this donation"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                       <span>Delete</span>
@@ -207,10 +219,10 @@ export default function DonorDashboard() {
 
       {/* Confirmation Dialog */}
       <ConfirmDialog
-        open={!!del}
-        title="Remove Donation Listing?"
-        message={`“${del?.food_type}” (${del?.quantity_kg} kg) will be removed from the active rescue queue.`}
-        confirmLabel="Remove Listing"
+        open={Boolean(del)}
+        title="Delete Donation"
+        message={`Are you sure you want to delete “${del?.food_type}” (${del?.quantity_kg} kg)? This action cannot be undone.`}
+        confirmLabel="Delete"
         onConfirm={remove}
         onCancel={() => setDel(null)}
         loading={busy}

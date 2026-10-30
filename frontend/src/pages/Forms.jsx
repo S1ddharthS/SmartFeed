@@ -415,7 +415,7 @@ export function RequestForm() {
           Cancel
         </Link>
         <Button type="submit" loading={busy} className="btn-primary !py-2.5 !px-5 text-sm">
-          Submit Food Request
+          Request Food
         </Button>
       </div>
     </form>

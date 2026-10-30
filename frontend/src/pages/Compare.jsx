@@ -71,7 +71,7 @@ export default function Compare() {
         actions={
           <Button className="btn-primary text-xs sm:text-sm !py-1.5 !px-3.5" loading={busy} onClick={run}>
             <Sparkles className="h-4 w-4" />
-            <span>Re-run Comparison</span>
+            <span>Compare</span>
           </Button>
         }
       />

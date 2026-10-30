@@ -74,11 +74,11 @@ export default function AdminControl() {
       setPlan((p) =>
         summary && routes?.length
           ? {
-              routes,
-              metrics: summary.metrics,
-              unserved_tasks: summary.unserved_tasks,
-              baseline_comparison: summary.baseline_comparison,
-            }
+            routes,
+            metrics: summary.metrics,
+            unserved_tasks: summary.unserved_tasks,
+            baseline_comparison: summary.baseline_comparison,
+          }
           : p
       )
       setErr('')
@@ -113,8 +113,7 @@ export default function AdminControl() {
         return api.runMatching()
       },
       (r) =>
-        `Matched ${r.matches_count} pairings (${fmtKg(r.total_allocated_kg)}) in ${
-          r.execution_time_ms
+        `Matched ${r.matches_count} pairings (${fmtKg(r.total_allocated_kg)}) in ${r.execution_time_ms
         } ms`
     )
 
@@ -151,14 +150,14 @@ export default function AdminControl() {
     const now = new Date(nowMs)
     const nd = urgentDrop
       ? {
-          donor_name: 'Emergency Drop – Central Kitchen',
-          food_type: 'Cooked meals',
-          quantity_kg: 60,
-          location: { lat: 12.9716, lng: 77.6101 },
-          ready_time: `${toLocalInput(now)}:00`,
-          expiry_time: `${toLocalInput(new Date(nowMs + 2.5 * 3.6e6))}:00`,
-          pickup_window: { start: fromMin(now.getHours() * 60 + now.getMinutes()), end: '23:00' },
-        }
+        donor_name: 'Emergency Drop – Central Kitchen',
+        food_type: 'Cooked meals',
+        quantity_kg: 60,
+        location: { lat: 12.9716, lng: 77.6101 },
+        ready_time: `${toLocalInput(now)}:00`,
+        expiry_time: `${toLocalInput(new Date(nowMs + 2.5 * 3.6e6))}:00`,
+        pickup_window: { start: fromMin(now.getHours() * 60 + now.getMinutes()), end: '23:00' },
+      }
       : undefined
     const r = await act(
       'plan',
@@ -233,9 +232,8 @@ export default function AdminControl() {
           <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => setShowClockSlider(!showClockSlider)}
-              className={`btn-secondary text-xs sm:text-sm !py-1.5 !px-3 ${
-                showClockSlider ? 'bg-warning-soft border-warning-border text-warning' : ''
-              }`}
+              className={`btn-secondary text-xs sm:text-sm !py-1.5 !px-3 ${showClockSlider ? 'bg-warning-soft border-warning-border text-warning' : ''
+                }`}
               title="Toggle time of day simulation"
             >
               <Clock className="h-3.5 w-3.5 text-warning" />
@@ -250,7 +248,7 @@ export default function AdminControl() {
               title="Simulate vehicle breakdown or emergency drop"
             >
               <RefreshCw className="h-3.5 w-3.5 text-ink-soft" />
-              <span>Simulate Disruption</span>
+              <span>Simulate Issue</span>
             </Button>
 
             <Button
@@ -368,7 +366,7 @@ export default function AdminControl() {
                   title="Run matching and plan multi-depot routes in one step"
                 >
                   <Zap className="h-4 w-4" />
-                  <span>1-Click Auto-Dispatch</span>
+                  <span>Dispatch Fleet</span>
                 </Button>
                 <Button
                   className="btn-secondary !px-3 !py-2 text-xs"
@@ -376,7 +374,7 @@ export default function AdminControl() {
                   onClick={runMatching}
                 >
                   <PlayCircle className="h-3.5 w-3.5" />
-                  <span>Match Only</span>
+                  <span>Match</span>
                 </Button>
               </>
             )}
@@ -389,7 +387,7 @@ export default function AdminControl() {
                   onClick={planRoutes}
                 >
                   <RouteIcon className="h-4 w-4" />
-                  <span>Plan Fleet Routes</span>
+                  <span>Plan Routes</span>
                 </Button>
                 <Button
                   className="btn-secondary !px-3 !py-2 text-xs"
@@ -397,7 +395,7 @@ export default function AdminControl() {
                   onClick={runMatching}
                 >
                   <RotateCcw className="h-3.5 w-3.5" />
-                  <span>Re-match</span>
+                  <span>Match Again</span>
                 </Button>
               </>
             )}
@@ -406,7 +404,7 @@ export default function AdminControl() {
               <div className="flex items-center gap-2">
                 <Link to="/admin/routes" className="btn-primary !px-3.5 !py-2 text-xs sm:text-sm">
                   <Truck className="h-4 w-4" />
-                  <span>Driver Timelines</span>
+                  <span>View Routes</span>
                 </Link>
                 <Button
                   className="btn-secondary !px-3 !py-2 text-xs"
@@ -415,7 +413,7 @@ export default function AdminControl() {
                   title="Recalculate matches from scratch"
                 >
                   <RotateCcw className="h-3.5 w-3.5" />
-                  <span>Re-match</span>
+                  <span>Match Again</span>
                 </Button>
               </div>
             )}
@@ -463,33 +461,30 @@ export default function AdminControl() {
           <div className="card p-1 flex gap-1 bg-slate-50 border-line">
             <button
               onClick={() => setActiveTab('intake')}
-              className={`flex-1 py-1.5 px-2.5 rounded text-xs font-semibold transition flex items-center justify-center gap-1.5 ${
-                activeTab === 'intake'
+              className={`flex-1 py-1.5 px-2.5 rounded text-xs font-semibold transition flex items-center justify-center gap-1.5 ${activeTab === 'intake'
                   ? 'bg-white text-ink shadow-sm'
                   : 'text-ink-soft hover:text-ink'
-              }`}
+                }`}
             >
               <Package className="h-3.5 w-3.5 text-brand-600" />
               <span>Surplus & Needs</span>
             </button>
             <button
               onClick={() => setActiveTab('matches')}
-              className={`flex-1 py-1.5 px-2.5 rounded text-xs font-semibold transition flex items-center justify-center gap-1.5 ${
-                activeTab === 'matches'
+              className={`flex-1 py-1.5 px-2.5 rounded text-xs font-semibold transition flex items-center justify-center gap-1.5 ${activeTab === 'matches'
                   ? 'bg-white text-ink shadow-sm'
                   : 'text-ink-soft hover:text-ink'
-              }`}
+                }`}
             >
               <Zap className="h-3.5 w-3.5 text-info" />
               <span>Matches ({d.results?.matches_count || 0})</span>
             </button>
             <button
               onClick={() => setActiveTab('fleet')}
-              className={`flex-1 py-1.5 px-2.5 rounded text-xs font-semibold transition flex items-center justify-center gap-1.5 ${
-                activeTab === 'fleet'
+              className={`flex-1 py-1.5 px-2.5 rounded text-xs font-semibold transition flex items-center justify-center gap-1.5 ${activeTab === 'fleet'
                   ? 'bg-white text-ink shadow-sm'
                   : 'text-ink-soft hover:text-ink'
-              }`}
+                }`}
             >
               <Truck className="h-3.5 w-3.5 text-warning" />
               <span>Fleet ({routes.length})</span>
@@ -503,17 +498,15 @@ export default function AdminControl() {
                 <div className="flex rounded border border-line bg-slate-50 p-0.5 text-xs font-medium">
                   <button
                     onClick={() => setIntakeFilter('donations')}
-                    className={`rounded px-2.5 py-1 transition ${
-                      intakeFilter === 'donations' ? 'bg-white text-ink shadow-sm font-semibold' : 'text-ink-soft'
-                    }`}
+                    className={`rounded px-2.5 py-1 transition ${intakeFilter === 'donations' ? 'bg-white text-ink shadow-sm font-semibold' : 'text-ink-soft'
+                      }`}
                   >
                     Donors ({d.scores.donations.length})
                   </button>
                   <button
                     onClick={() => setIntakeFilter('requests')}
-                    className={`rounded px-2.5 py-1 transition ${
-                      intakeFilter === 'requests' ? 'bg-white text-ink shadow-sm font-semibold' : 'text-ink-soft'
-                    }`}
+                    className={`rounded px-2.5 py-1 transition ${intakeFilter === 'requests' ? 'bg-white text-ink shadow-sm font-semibold' : 'text-ink-soft'
+                      }`}
                   >
                     Shelters ({d.scores.requests.length})
                   </button>
@@ -555,11 +548,10 @@ export default function AdminControl() {
                             item: src,
                           })
                         }
-                        className={`w-full rounded-lg border p-3 text-left transition-all ${
-                          isSelected
+                        className={`w-full rounded-lg border p-3 text-left transition-all ${isSelected
                             ? 'border-brand-500 bg-brand-50/40 shadow-sm'
                             : 'border-line bg-white hover:border-slate-300'
-                        }`}
+                          }`}
                       >
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex items-center gap-1.5">
@@ -728,11 +720,10 @@ export default function AdminControl() {
                       onMouseEnter={() => setFocus(r.vehicle_id)}
                       onMouseLeave={() => setFocus(null)}
                       onClick={() => setFocus(focus === r.vehicle_id ? null : r.vehicle_id)}
-                      className={`flex w-full items-center gap-2.5 rounded-lg border p-2.5 text-left transition-all ${
-                        focus === r.vehicle_id
+                      className={`flex w-full items-center gap-2.5 rounded-lg border p-2.5 text-left transition-all ${focus === r.vehicle_id
                           ? 'border-brand-500 bg-brand-50/50 shadow-sm'
                           : 'border-line bg-white hover:border-slate-300'
-                      }`}
+                        }`}
                     >
                       <span
                         className="grid h-7 w-7 place-items-center rounded text-xs font-bold text-white shadow-sm"
@@ -796,12 +787,10 @@ export default function AdminControl() {
 
                   <p className="mt-1 text-xs text-ink-soft leading-relaxed">
                     {sel.kind === 'donation' &&
-                      `${sel.item.food_type} · ${fmtKg(sel.item.remaining_kg)} remaining · Pickup: ${
-                        sel.item.pickup_window.start
+                      `${sel.item.food_type} · ${fmtKg(sel.item.remaining_kg)} remaining · Pickup: ${sel.item.pickup_window.start
                       }–${sel.item.pickup_window.end}`}
                     {sel.kind === 'request' &&
-                      `Needs ${fmtKg(sel.item.remaining_kg)} · Level ${sel.item.need_level}/5 · Window: ${
-                        sel.item.delivery_window.start
+                      `Needs ${fmtKg(sel.item.remaining_kg)} · Level ${sel.item.need_level}/5 · Window: ${sel.item.delivery_window.start
                       }–${sel.item.delivery_window.end}`}
                     {sel.kind === 'depot' && `Distribution Hub · Coordinates: ${sel.item.location.lat}, ${sel.item.location.lng}`}
                   </p>
@@ -813,7 +802,7 @@ export default function AdminControl() {
                     className="btn-ghost !p-1 text-ink-mute hover:text-ink text-xs"
                     onClick={() => setSel(null)}
                   >
-                    Dismiss
+                    Close
                   </button>
                 </div>
               </div>
@@ -840,7 +829,7 @@ export default function AdminControl() {
               Cancel
             </button>
             <Button className="btn-primary !py-1.5 !px-3.5 text-xs" onClick={replan}>
-              Re-optimize Fleet
+              Update Routes
             </Button>
           </>
         }
@@ -857,11 +846,10 @@ export default function AdminControl() {
               return (
                 <label
                   key={v.id}
-                  className={`cursor-pointer rounded-lg border p-2 text-xs transition-all ${
-                    isOffline
+                  className={`cursor-pointer rounded-lg border p-2 text-xs transition-all ${isOffline
                       ? 'border-urgent-border bg-urgent-soft text-urgent font-medium'
                       : 'border-line bg-white hover:bg-slate-50 text-ink'
-                  }`}
+                    }`}
                 >
                   <input
                     type="checkbox"

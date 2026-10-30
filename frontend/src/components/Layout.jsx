@@ -21,21 +21,21 @@ import { Toaster } from './ui'
 
 const LINKS = {
   donor: [
-    { to: '/donor', label: 'My Surplus', icon: Soup },
+    { to: '/donor', label: 'Donations', icon: Soup },
   ],
   receiver: [
-    { to: '/receiver', label: 'My Requests', icon: HeartHandshake },
+    { to: '/receiver', label: 'Requests', icon: HeartHandshake },
   ],
   admin: [
-    { to: '/admin', label: 'Control Center', icon: LayoutDashboard },
-    { to: '/admin/routes', label: 'Routes & Timelines', icon: RouteIcon },
+    { to: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+    { to: '/admin/routes', label: 'Routes', icon: RouteIcon },
     { to: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
     { to: '/admin/compare', label: 'Comparison', icon: GitCompare },
-    { to: '/admin/setup', label: 'Depots & Fleet', icon: Settings2 },
+    { to: '/admin/setup', label: 'Fleet Setup', icon: Settings2 },
   ],
 }
 
-export function Brand({ light = false }) {
+export function Brand() {
   return (
     <Link to="/" className="flex items-center gap-2.5 transition-opacity hover:opacity-95">
       <div className="grid h-9 w-9 place-items-center rounded-lg bg-brand-500 text-white shadow-sm">
@@ -188,7 +188,7 @@ export default function Layout() {
                     nav('/')
                   }}
                   title="Sign out of account"
-                  aria-label="Log out"
+                  aria-label="Sign Out"
                 >
                   <LogOut className="h-3.5 w-3.5" />
                   <span className="hidden sm:inline">Sign Out</span>
@@ -200,7 +200,7 @@ export default function Layout() {
                   Log In
                 </Link>
                 <Link to="/register" className="btn-primary !px-3 !py-1.5 text-xs">
-                  Get Started
+                  Sign Up
                 </Link>
               </div>
             )}
@@ -281,7 +281,7 @@ export default function Layout() {
           <div className="flex items-center gap-2">
             <span className="font-semibold text-ink">SmartFeed</span>
             <span className="text-slate-300">·</span>
-            <span>Food Surplus Matching & Routing Platform</span>
+            <span>Food Surplus Matching & Routing</span>
           </div>
           <div className="flex items-center gap-4 text-xs text-ink-soft">
             <Link to="/how-it-works" className="hover:text-ink transition-colors">How It Works</Link>

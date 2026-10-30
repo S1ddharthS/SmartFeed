@@ -59,7 +59,7 @@ export default function RouteDetails() {
           icon={RouteIcon}
           action={
             <Button className="btn-primary" loading={busy} onClick={plan}>
-              Match & Plan Routes Now
+              Plan Routes
             </Button>
           }
         />
@@ -86,7 +86,7 @@ export default function RouteDetails() {
         actions={
           <div className="flex items-center gap-2">
             <Button className="btn-secondary text-xs sm:text-sm !py-1.5 !px-3" loading={busy} onClick={plan}>
-              Re-optimize
+              Update Routes
             </Button>
             <button
               className="btn-primary text-xs sm:text-sm !py-1.5 !px-3.5"
