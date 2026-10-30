@@ -136,6 +136,22 @@ export default function AdminControl() {
     }
   }
 
+  const runFullPipeline = async () => {
+    setBusy('full')
+    try {
+      const matchRes = await api.runMatching()
+      const planRes = await api.planRoutes()
+      setPlan(planRes)
+      setActiveTab('fleet')
+      toast(`Complete pipeline dispatched! ${matchRes.matches_count} matches & ${planRes.routes.length} vehicle routes.`)
+      await load()
+    } catch (e) {
+      toast(e.message, 'error')
+    } finally {
+      setBusy('')
+    }
+  }
+
   const replan = async () => {
     setReplanOpen(false)
     const now = new Date(nowMs)
@@ -348,16 +364,27 @@ export default function AdminControl() {
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 shrink-0">
+          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
             {currentStage === 1 && (
-              <Button
-                className="btn-primary !px-5 !py-3 shadow-md hover:shadow-lg text-sm"
-                loading={busy === 'match'}
-                onClick={runMatching}
-              >
-                <PlayCircle className="h-5 w-5" />
-                <span>Run Urgency Matching</span>
-              </Button>
+              <>
+                <Button
+                  className="btn-primary !px-5 !py-3 shadow-md hover:shadow-lg text-sm bg-gradient-to-r from-emerald-600 to-leaf-700"
+                  loading={busy === 'full'}
+                  onClick={runFullPipeline}
+                  title="Run matching and plan multi-depot routes in one step"
+                >
+                  <Zap className="h-5 w-5 text-amber-300" />
+                  <span>1-Click Auto-Dispatch (Match + Route)</span>
+                </Button>
+                <Button
+                  className="btn-secondary !px-3.5 !py-3 text-xs"
+                  loading={busy === 'match'}
+                  onClick={runMatching}
+                >
+                  <PlayCircle className="h-4 w-4" />
+                  <span>Step 1: Match Only</span>
+                </Button>
+              </>
             )}
 
             {currentStage === 2 && (

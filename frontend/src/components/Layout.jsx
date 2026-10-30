@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { BarChart3, BookOpen, Database, GitCompare, HeartHandshake, LayoutDashboard, LogOut, Menu, Route as RouteIcon, Settings2, Soup, User, X } from 'lucide-react'
+import { BarChart3, BookOpen, Database, GitCompare, HeartHandshake, LayoutDashboard, LogOut, Menu, Route as RouteIcon, Settings2, Soup, Sparkles, User, X } from 'lucide-react'
 import { useApp } from '../context/AppContext'
+import { homeFor } from '../lib/utils'
 import { Toaster } from './ui'
 
 const LINKS = {
@@ -39,13 +40,30 @@ export function Brand({ light = false }) {
 }
 
 export default function Layout() {
-  const { user, signOut, live, mode, switchMode } = useApp()
+  const { user, signIn, signOut, live, mode, switchMode, toast } = useApp()
   const nav = useNavigate()
   const [open, setOpen] = useState(false)
   const links = [
     ...(user ? LINKS[user.role] || [] : []),
     { to: '/how-it-works', label: 'How It Works', icon: BookOpen },
   ]
+
+  const switchDemoPersona = async (roleName) => {
+    const creds = {
+      admin: { u: 'admin', p: 'admin123' },
+      donor: { u: 'greenleaf', p: 'donor123' },
+      receiver: { u: 'hopeshelter', p: 'receiver123' },
+    }[roleName]
+    if (creds) {
+      try {
+        const u = await signIn(creds.u, creds.p)
+        toast(`Switched persona to ${u.username} (${u.role})`)
+        nav(homeFor(u.role))
+      } catch (e) {
+        toast(e.message, 'error')
+      }
+    }
+  }
 
   const navCls = ({ isActive }) =>
     `flex items-center gap-2 rounded-xl px-3.5 py-2 text-sm font-semibold transition-all ${
@@ -79,7 +97,45 @@ export default function Layout() {
           </nav>
 
           {/* Right Action Area */}
-          <div className="ml-auto flex items-center gap-3">
+          <div className="ml-auto flex items-center gap-2.5">
+            {/* Quick Demo Persona Switcher (Crucial for live demonstrations) */}
+            <div className="hidden xl:flex items-center gap-1 rounded-xl border border-slate-200 bg-slate-50/80 p-1 text-[11px] font-semibold">
+              <span className="text-ink-mute px-1.5 flex items-center gap-1">
+                <Sparkles className="h-3 w-3 text-leaf-700" />
+                <span>Demo Role:</span>
+              </span>
+              <button
+                type="button"
+                onClick={() => switchDemoPersona('admin')}
+                className={`rounded-lg px-2 py-0.5 transition ${
+                  user?.role === 'admin' ? 'bg-white text-leaf-900 shadow-sm font-bold' : 'text-ink-soft hover:text-ink'
+                }`}
+                title="Switch to Food Bank Admin"
+              >
+                Admin
+              </button>
+              <button
+                type="button"
+                onClick={() => switchDemoPersona('donor')}
+                className={`rounded-lg px-2 py-0.5 transition ${
+                  user?.role === 'donor' ? 'bg-white text-leaf-900 shadow-sm font-bold' : 'text-ink-soft hover:text-ink'
+                }`}
+                title="Switch to Restaurant Donor"
+              >
+                Donor
+              </button>
+              <button
+                type="button"
+                onClick={() => switchDemoPersona('receiver')}
+                className={`rounded-lg px-2 py-0.5 transition ${
+                  user?.role === 'receiver' ? 'bg-white text-leaf-900 shadow-sm font-bold' : 'text-ink-soft hover:text-ink'
+                }`}
+                title="Switch to Shelter Beneficiary"
+              >
+                Shelter
+              </button>
+            </div>
+
             {/* Environment Indicator & Switcher */}
             <div className="hidden sm:flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/80 px-2.5 py-1 text-xs">
               <span className="flex items-center gap-1.5 font-medium text-ink-soft">

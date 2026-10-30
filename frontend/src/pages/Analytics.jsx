@@ -1,11 +1,12 @@
+import { useState } from 'react'
 import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { Award, CheckCircle2, ChevronRight, Leaf, Route as RouteIcon, ShieldCheck, Soup, Sparkles, TrendingUp, Truck, Utensils } from 'lucide-react'
+import { Award, CheckCircle2, ChevronRight, Leaf, Route as RouteIcon, ShieldCheck, Soup, Sparkles, TrendingUp, Truck, Utensils, Zap } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { api } from '../api/client'
 import { useApp } from '../context/AppContext'
 import { useAsync } from '../lib/useAsync'
 import { colorForVehicle, fmtKg, mealsFromKg } from '../lib/utils'
-import { EmptyState, ErrorState, PageHeader, PageLoader, StatCard } from '../components/ui'
+import { Button, EmptyState, ErrorState, PageHeader, PageLoader, StatCard } from '../components/ui'
 
 const ChartCard = ({ title, children, sub }) => (
   <div className="card p-5 border-slate-200/90 shadow-sm transition hover:shadow-card-hover flex flex-col">
@@ -18,7 +19,8 @@ const ChartCard = ({ title, children, sub }) => (
 )
 
 export default function Analytics() {
-  const { demoMin } = useApp()
+  const { demoMin, toast } = useApp()
+  const [busy, setBusy] = useState(false)
   const { data, loading, error, reload } = useAsync(async () => {
     const [summary, routes, scores] = await Promise.all([
       api.summary().catch(() => null),
@@ -27,6 +29,20 @@ export default function Analytics() {
     ])
     return { summary, routes: routes || [], scores }
   }, [demoMin])
+
+  const runPipelineNow = async () => {
+    setBusy(true)
+    try {
+      await api.runMatching()
+      await api.planRoutes()
+      toast('Fleet optimization executed! Loading analytics…')
+      reload()
+    } catch (e) {
+      toast(e.message, 'error')
+    } finally {
+      setBusy(false)
+    }
+  }
 
   if (loading) return <PageLoader label="Aggregating network analytics…" />
   if (error) return <ErrorState message={error} onRetry={reload} />
@@ -44,9 +60,15 @@ export default function Analytics() {
           text="Run matching and plan routes in the Control Center to generate optimization telemetry."
           icon={Leaf}
           action={
-            <Link to="/admin" className="btn-primary">
-              Go to Control Center
-            </Link>
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <Button className="btn-primary" loading={busy} onClick={runPipelineNow}>
+                <Zap className="h-4 w-4 text-amber-300" />
+                <span>Auto-Generate Analytics (Run Simulation)</span>
+              </Button>
+              <Link to="/admin" className="btn-secondary">
+                Go to Control Center
+              </Link>
+            </div>
           }
         />
       </div>

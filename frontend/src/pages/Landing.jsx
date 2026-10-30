@@ -1,10 +1,28 @@
-import { Link } from 'react-router-dom'
-import { ArrowRight, CheckCircle2, Clock, HeartHandshake, MapPinned, ShieldCheck, Soup, Sparkles, Split, Timer, Truck, Users, Zap } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
+import { ArrowRight, CheckCircle2, Clock, HeartHandshake, MapPinned, Play, ShieldCheck, Soup, Sparkles, Split, Timer, Truck, Users, Zap } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import { homeFor } from '../lib/utils'
 
 export default function Landing() {
-  const { user } = useApp()
+  const { user, signIn, toast } = useApp()
+  const nav = useNavigate()
+
+  const launchDemo = async (roleName) => {
+    const creds = {
+      admin: { u: 'admin', p: 'admin123' },
+      donor: { u: 'greenleaf', p: 'donor123' },
+      receiver: { u: 'hopeshelter', p: 'receiver123' },
+    }[roleName]
+    if (creds) {
+      try {
+        const u = await signIn(creds.u, creds.p)
+        toast(`Launched live simulation as ${u.username} (${u.role})`)
+        nav(homeFor(u.role))
+      } catch (e) {
+        toast(e.message, 'error')
+      }
+    }
+  }
 
   const problems = [
     {
@@ -79,24 +97,36 @@ export default function Landing() {
                 to={homeFor(user.role)}
                 className="btn bg-white text-slate-900 font-bold hover:bg-slate-100 shadow-lg !py-3 !px-6"
               >
-                <span>Go to My Dashboard</span>
+                <span>Go to My Dashboard ({user.role})</span>
                 <ArrowRight className="h-4 w-4" />
               </Link>
             ) : (
               <>
-                <Link
-                  to="/login"
-                  className="btn bg-emerald-500 text-slate-950 font-bold hover:bg-emerald-400 shadow-lg !py-3 !px-6"
+                <button
+                  type="button"
+                  onClick={() => launchDemo('admin')}
+                  className="btn bg-emerald-500 text-slate-950 font-bold hover:bg-emerald-400 shadow-lg !py-3 !px-6 flex items-center gap-2"
                 >
-                  <span>Launch Live Simulation</span>
+                  <ShieldCheck className="h-4 w-4" />
+                  <span>Launch Admin Control Center</span>
                   <ArrowRight className="h-4 w-4" />
-                </Link>
-                <Link
-                  to="/register"
-                  className="btn border border-white/30 bg-white/10 text-white font-semibold hover:bg-white/20 !py-3 !px-6 backdrop-blur-sm"
+                </button>
+                <button
+                  type="button"
+                  onClick={() => launchDemo('donor')}
+                  className="btn border border-white/30 bg-white/10 text-white font-semibold hover:bg-white/20 !py-3 !px-5 backdrop-blur-sm flex items-center gap-2"
                 >
-                  Create an Account
-                </Link>
+                  <Soup className="h-4 w-4 text-emerald-300" />
+                  <span>Donor Demo</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => launchDemo('receiver')}
+                  className="btn border border-white/30 bg-white/10 text-white font-semibold hover:bg-white/20 !py-3 !px-5 backdrop-blur-sm flex items-center gap-2"
+                >
+                  <HeartHandshake className="h-4 w-4 text-blue-300" />
+                  <span>Shelter Demo</span>
+                </button>
               </>
             )}
             <Link
@@ -180,7 +210,8 @@ export default function Landing() {
               role: 'Food Donors',
               sub: 'Restaurants, caterers, banquet halls, groceries',
               desc: 'List surplus in 60 seconds. Get clear pickup notifications and track the exact shelter receiving your meals.',
-              cta: 'Donor Dashboard',
+              cta: 'Launch Donor Portal',
+              key: 'donor',
               to: '/donor',
               icon: Soup,
             },
@@ -188,7 +219,8 @@ export default function Landing() {
               role: 'Beneficiaries & Shelters',
               sub: 'Night shelters, care homes, orphanages, soup kitchens',
               desc: 'Specify food quantities and hunger urgency. Get verified vehicle arrival ETAs so volunteers are ready at the door.',
-              cta: 'Receiver Portal',
+              cta: 'Launch Shelter Portal',
+              key: 'receiver',
               to: '/receiver',
               icon: HeartHandshake,
             },
@@ -196,15 +228,17 @@ export default function Landing() {
               role: 'Rescue Network Admins',
               sub: 'Food bank operations coordinators & logistics staff',
               desc: 'One-click matching and routing, live map telemetry, driver manifests, and instant re-planning when disruptions occur.',
-              cta: 'Operations Center',
+              cta: 'Launch Operations Center',
+              key: 'admin',
               to: '/admin',
               icon: Truck,
             },
           ].map((c) => (
-            <Link
+            <button
               key={c.role}
-              to={c.to}
-              className="card p-6 border-slate-200 shadow-sm transition-all hover:border-leaf-300 hover:shadow-card-hover hover:-translate-y-0.5 flex flex-col justify-between group"
+              type="button"
+              onClick={() => (user ? nav(c.to) : launchDemo(c.key))}
+              className="card p-6 border-slate-200 shadow-sm transition-all hover:border-leaf-300 hover:shadow-card-hover hover:-translate-y-0.5 flex flex-col justify-between group text-left"
             >
               <div>
                 <div className="grid h-11 w-11 place-items-center rounded-2xl bg-slate-100 text-leaf-800 mb-4 group-hover:bg-leaf-100 transition">
@@ -219,7 +253,7 @@ export default function Landing() {
                 <span>{c.cta}</span>
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </div>
-            </Link>
+            </button>
           ))}
         </div>
       </section>

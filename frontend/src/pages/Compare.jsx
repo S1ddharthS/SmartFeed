@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AlertCircle, AlertTriangle, ArrowRight, CheckCircle2, Clock, Filter, GitCompare, Sparkles, TrendingUp, XCircle } from 'lucide-react'
 import { api } from '../api/client'
 import { useApp } from '../context/AppContext'
@@ -15,6 +15,12 @@ export default function Compare() {
     const [legacy, results] = await Promise.all([api.legacy(), api.matchResults().catch(() => null)])
     return { legacy, results }
   }, [demoMin])
+
+  useEffect(() => {
+    if (data?.legacy && (!data?.results?.matches || data.results.matches.length === 0)) {
+      api.runMatching().then(() => reload()).catch(() => {})
+    }
+  }, [data?.legacy, data?.results?.matches?.length]) // eslint-disable-line
 
   const run = async () => {
     setBusy(true)
