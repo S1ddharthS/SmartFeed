@@ -95,21 +95,21 @@ export default function Landing() {
   return (
     <div className="space-y-14 animate-fade-in">
       {/* Hero Section */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-leaf-950 to-slate-900 px-6 py-14 text-white md:px-12 md:py-20 shadow-elevated">
-        <div className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-emerald-500/20 blur-3xl" />
-        <div className="pointer-events-none absolute -left-20 -bottom-20 h-80 w-80 rounded-full bg-leaf-600/20 blur-3xl" />
+      <section className="relative overflow-hidden rounded-3xl bg-leaf-900 px-6 py-14 text-white md:px-12 md:py-20 shadow-elevated">
+        <div className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-leaf-600/40 blur-3xl" />
+        <div className="pointer-events-none absolute -left-20 -bottom-20 h-80 w-80 rounded-full bg-leaf-500/20 blur-3xl" />
 
         <div className="relative max-w-3xl space-y-5">
-          <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-emerald-300 ring-1 ring-white/20 backdrop-blur-sm">
-            <Sparkles className="h-3.5 w-3.5" /> Urgency-First Food Rescue Logistics
+          <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-leaf-200 ring-1 ring-white/20 backdrop-blur-sm">
+            <Sparkles className="h-3.5 w-3.5 text-leaf-300" /> Urgency-First Food Rescue Logistics
           </div>
 
-          <h1 className="font-display text-3xl font-extrabold leading-tight tracking-tight sm:text-5xl md:text-6xl">
+          <h1 className="font-display text-3xl font-extrabold leading-tight tracking-tight sm:text-5xl md:text-6xl text-white">
             Food should reach a hungry plate{' '}
-            <span className="text-emerald-400 underline decoration-emerald-500/50 decoration-wavy">before</span> it reaches a bin.
+            <span className="text-leaf-300 underline decoration-leaf-400/50 decoration-wavy">before</span> it reaches a bin.
           </h1>
 
-          <p className="text-base sm:text-lg text-slate-300 leading-relaxed max-w-2xl">
+          <p className="text-base sm:text-lg text-leaf-100 leading-relaxed max-w-2xl">
             SmartFeed transforms urban food rescue: automated urgency scoring, split-lot matching, and multi-depot fleet routing ensure meals arrive hot, fresh, and on time.
           </p>
 
@@ -117,7 +117,7 @@ export default function Landing() {
             {user ? (
               <Link
                 to={homeFor(user.role)}
-                className="btn bg-white text-slate-900 font-bold hover:bg-slate-100 shadow-lg !py-3 !px-6"
+                className="btn bg-white text-leaf-900 font-bold hover:bg-leaf-50 shadow-lg !py-3 !px-6"
               >
                 <span>Go to My Dashboard ({user.role})</span>
                 <ArrowRight className="h-4 w-4" />
@@ -127,7 +127,7 @@ export default function Landing() {
                 <button
                   type="button"
                   onClick={() => launchDemo('admin')}
-                  className="btn bg-emerald-500 text-slate-950 font-bold hover:bg-emerald-400 shadow-lg !py-3 !px-6 flex items-center gap-2"
+                  className="btn bg-white text-leaf-900 font-bold hover:bg-leaf-50 shadow-lg !py-3 !px-6 flex items-center gap-2"
                 >
                   <ShieldCheck className="h-4 w-4" />
                   <span>Launch Admin Operations</span>
@@ -138,7 +138,7 @@ export default function Landing() {
                   onClick={() => launchDemo('donor')}
                   className="btn border border-white/30 bg-white/10 text-white font-semibold hover:bg-white/20 !py-3 !px-5 backdrop-blur-sm flex items-center gap-2"
                 >
-                  <Soup className="h-4 w-4 text-emerald-300" />
+                  <Soup className="h-4 w-4 text-leaf-200" />
                   <span>Donor Demo</span>
                 </button>
                 <button
@@ -146,14 +146,14 @@ export default function Landing() {
                   onClick={() => launchDemo('receiver')}
                   className="btn border border-white/30 bg-white/10 text-white font-semibold hover:bg-white/20 !py-3 !px-5 backdrop-blur-sm flex items-center gap-2"
                 >
-                  <HeartHandshake className="h-4 w-4 text-blue-300" />
+                  <HeartHandshake className="h-4 w-4 text-leaf-200" />
                   <span>Shelter Demo</span>
                 </button>
               </>
             )}
             <Link
               to="/how-it-works"
-              className="btn text-slate-300 hover:text-white hover:bg-white/10 !py-3 !px-4"
+              className="btn text-leaf-100 hover:text-white hover:bg-white/10 !py-3 !px-4"
             >
               How It Works
             </Link>
@@ -178,7 +178,7 @@ export default function Landing() {
       </section>
 
       {/* Evaluator 60-Second Fast-Track Guide */}
-      <section className="card p-6 border-slate-200 bg-gradient-to-r from-slate-900 to-slate-800 text-white shadow-elevated">
+      <section className="card p-6 border-slate-200 bg-leaf-900 text-white shadow-elevated">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-1.5">
             <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-xs font-bold text-emerald-300 border border-emerald-400/30">
@@ -187,7 +187,7 @@ export default function Landing() {
             <h2 className="text-xl font-bold font-display sm:text-2xl text-white">
               How to Test SmartFeed in Under 60 Seconds
             </h2>
-            <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
+            <p className="text-xs sm:text-sm text-leaf-100 max-w-2xl leading-relaxed">
               We built SmartFeed to be zero-friction. You do not need to fill out multiple forms to see the magic. Everything is fully simulated in Bangalore:
             </p>
           </div>
@@ -195,7 +195,7 @@ export default function Landing() {
           <button
             type="button"
             onClick={() => launchDemo('admin')}
-            className="btn bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold !py-3 !px-5 shrink-0 shadow-lg"
+            className="btn bg-white hover:bg-leaf-50 text-leaf-900 font-bold !py-3 !px-5 shrink-0 shadow-lg"
           >
             <Zap className="h-4 w-4" />
             <span>Launch & Auto-Dispatch Now</span>

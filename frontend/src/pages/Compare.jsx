@@ -77,13 +77,13 @@ export default function Compare() {
       />
 
       {/* High-Level Impact Scorecard */}
-      <div className="card p-5 bg-gradient-to-r from-slate-900 to-slate-800 text-white shadow-elevated">
+      <div className="card p-5 bg-leaf-900 text-white shadow-elevated">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-1 text-center md:text-left">
             <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">
               The Fundamental Difference
             </span>
-            <h2 className="text-xl font-bold font-display sm:text-2xl">
+            <h2 className="text-xl font-bold font-display sm:text-2xl text-white">
               Proximity Heuristic vs SmartFeed Optimization
             </h2>
             <p className="text-xs sm:text-sm text-slate-300 max-w-xl">

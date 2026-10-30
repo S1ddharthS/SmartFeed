@@ -114,7 +114,7 @@ export function Login() {
         </form>
 
         {/* 1-Tap Demo Switcher */}
-        <div className="card p-6 md:col-span-7 border-slate-200 shadow-sm bg-gradient-to-br from-slate-900 via-slate-900 to-leaf-950 text-white space-y-4">
+        <div className="card p-6 md:col-span-7 border-leaf-800/50 shadow-sm bg-leaf-900 text-white space-y-4">
           <div>
             <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-[11px] font-bold text-emerald-300 ring-1 ring-emerald-500/30">
               <Sparkles className="h-3 w-3" /> 1-Tap Instant Persona Access
