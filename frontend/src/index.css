@@ -4,17 +4,18 @@
 
 @layer base {
   html {
-    @apply bg-cream-50 text-ink font-sans antialiased;
+    @apply bg-app text-ink font-sans antialiased;
+    color-scheme: light;
   }
   ::selection {
-    background-color: #dcfce7;
-    color: #14532d;
+    background-color: #E9F8F0;
+    color: #0E734A;
   }
-  h1, h2, h3 {
-    @apply font-display tracking-tight text-ink;
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight text-ink font-semibold;
   }
   :focus-visible {
-    outline: 2px solid #16a34a;
+    outline: 2px solid #16A36A;
     outline-offset: 2px;
   }
 }
@@ -26,19 +27,19 @@
   .btn-secondary,
   .btn-ghost,
   .btn-danger {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.98];
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-xs sm:text-sm font-semibold transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.98];
   }
 
   .btn-primary {
-    @apply bg-leaf-700 text-white hover:bg-leaf-800 shadow-sm hover:shadow;
+    @apply bg-brand-500 text-white hover:bg-brand-600 shadow-sm hover:shadow;
   }
 
   .btn-accent {
-    @apply bg-urgent text-white hover:brightness-95 shadow-sm;
+    @apply bg-brand-500 text-white hover:bg-brand-600 shadow-sm;
   }
 
   .btn-secondary {
-    @apply border border-slate-200/90 bg-white text-ink hover:bg-slate-50 hover:border-slate-300 shadow-sm;
+    @apply border border-line bg-white text-ink hover:bg-slate-50 hover:border-slate-300 shadow-sm;
   }
 
   .btn-ghost {
@@ -46,12 +47,12 @@
   }
 
   .btn-danger {
-    @apply border border-urgent/20 bg-urgent-soft text-urgent hover:bg-urgent hover:text-white transition-colors;
+    @apply border border-urgent-border bg-urgent-soft text-urgent hover:bg-urgent hover:text-white transition-colors;
   }
 
   .card,
   .card-hover {
-    @apply rounded-2xl border border-slate-200/80 bg-white shadow-card transition-shadow duration-200;
+    @apply rounded-xl border border-line bg-surface shadow-card transition-all duration-150;
   }
 
   .card-hover {
@@ -59,7 +60,7 @@
   }
 
   .input {
-    @apply w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-mute transition focus:border-leaf-600 focus:outline-none focus:ring-2 focus:ring-leaf-100;
+    @apply w-full rounded-lg border border-line bg-white px-3.5 py-2 text-sm text-ink placeholder:text-ink-mute transition focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/10;
   }
 
   .label {
@@ -67,11 +68,11 @@
   }
 
   .th {
-    @apply px-3.5 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-ink-mute;
+    @apply px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-ink-soft bg-slate-50/80;
   }
 
   .td {
-    @apply px-3.5 py-3 text-sm text-ink;
+    @apply px-4 py-3 text-sm text-ink border-t border-line;
   }
 
   .badge {
@@ -79,29 +80,45 @@
   }
 }
 
-/* Custom sleek scrollbar for panels */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Custom sleek scrollbar */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 transparent;
+  scrollbar-color: #E2E8F0 transparent;
 }
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #E2E8F0;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #CBD5E1;
 }
 
 .leaflet-container {
   font-family: inherit;
-  border-radius: 1rem;
+  border-radius: 0.75rem;
+  z-index: 10;
 }
 
 .fr-pin {
@@ -109,16 +126,16 @@
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  border: 2px solid #fff;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 2px 6px rgba(23, 32, 51, 0.15);
   font-size: 13px;
-  color: #fff;
+  color: #FFFFFF;
   font-weight: 700;
   transition: transform 0.15s ease;
 }
 
 .fr-pin:hover {
-  transform: scale(1.12);
+  transform: scale(1.15);
 }
 
 @media print {
@@ -126,11 +143,11 @@
     display: none !important;
   }
   body {
-    background: #fff;
+    background: #FFFFFF;
   }
   .card {
     box-shadow: none;
     break-inside: avoid;
-    border-color: #e2e8f0;
+    border-color: #E8EDF2;
   }
 }

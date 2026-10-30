@@ -35,19 +35,19 @@ export default function Compare() {
     }
   }
 
-  if (loading) return <PageLoader label="Comparing matching algorithms…" />
+  if (loading) return <PageLoader label="Comparing dispatch models…" />
   if (error) return <ErrorState message={error} onRetry={reload} />
 
   if (!data.legacy) {
     return (
-      <>
+      <div className="space-y-6 animate-fade-in">
         <PageHeader title="Algorithm Comparison" subtitle="Proximity heuristic vs Urgency-first engine" />
         <EmptyState
           title="Comparison runs in Demo Mode"
-          text="The legacy proximity simulator runs in demo mode. Switch the data source in the top navbar to 'Demo data' to see the side-by-side simulation."
+          text="The legacy proximity benchmark runs in demo mode. Switch the data source in the header to 'Demo data' to compare results."
           icon={GitCompare}
         />
-      </>
+      </div>
     )
   }
 
@@ -59,60 +59,60 @@ export default function Compare() {
   const legacyRows = filterMode === 'issues' ? legacy.rows.filter((r) => r.late) : legacy.rows
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       <PageHeader
-        title="Matching Algorithm Comparison"
-        subtitle="Identical donors, identical receivers, identical clock. See how SmartFeed eliminates food waste compared to naive proximity matching."
+        title="Algorithm Comparison"
+        subtitle="Identical donors, identical receivers, identical clock: Proximity heuristic vs SmartFeed urgency optimization."
         badge={
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-800 border border-blue-200">
-            <GitCompare className="h-3.5 w-3.5 text-blue-700" /> Benchmark Comparison
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-info-soft border border-info-border px-2.5 py-0.5 text-xs font-semibold text-info">
+            <GitCompare className="h-3 w-3 text-info" /> Benchmark Audit
           </span>
         }
         actions={
-          <Button className="btn-primary" loading={busy} onClick={run}>
+          <Button className="btn-primary text-xs sm:text-sm !py-1.5 !px-3.5" loading={busy} onClick={run}>
             <Sparkles className="h-4 w-4" />
-            <span>Re-run SmartFeed Matching</span>
+            <span>Re-run Comparison</span>
           </Button>
         }
       />
 
-      {/* High-Level Impact Scorecard */}
-      <div className="card p-5 bg-gradient-to-r from-slate-900 to-slate-800 text-white shadow-elevated">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="space-y-1 text-center md:text-left">
-            <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">
+      {/* High-Level Impact Scorecard (Pure Light-Mode SaaS) */}
+      <div className="card p-5 border-line bg-white shadow-card">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+          <div className="space-y-1">
+            <span className="text-xs font-semibold uppercase tracking-wider text-brand-600">
               The Fundamental Difference
             </span>
-            <h2 className="text-xl font-bold font-display sm:text-2xl">
+            <h2 className="text-base sm:text-lg font-bold text-ink">
               Proximity Heuristic vs SmartFeed Optimization
             </h2>
-            <p className="text-xs sm:text-sm text-slate-300 max-w-xl">
-              Traditional food rescue matches whoever is nearest or whoever posted first. SmartFeed considers expiry deadlines, hunger urgency, and route feasibility.
+            <p className="text-xs sm:text-sm text-ink-soft max-w-xl">
+              Traditional apps match whoever is closest or whoever logged in first. SmartFeed considers expiry curves, hunger severity, and route feasibility.
             </p>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 w-full md:w-auto text-center">
-            <div className="rounded-xl bg-white/10 p-3 backdrop-blur border border-white/10">
-              <div className="text-[11px] font-semibold text-rose-300 uppercase">Food Wasted</div>
-              <div className="font-display text-lg font-bold text-white mt-0.5">
-                <span className="text-rose-400 line-through mr-1.5">{fmtKg(legacy.wasted_kg)}</span>
-                <span className="text-emerald-400">0 kg</span>
+          <div className="grid grid-cols-3 gap-2.5 w-full md:w-auto text-center shrink-0">
+            <div className="rounded-lg border border-line bg-slate-50/70 p-2.5">
+              <div className="text-[10px] font-medium text-ink-mute uppercase">Food Wasted</div>
+              <div className="text-sm sm:text-base font-bold text-ink mt-0.5">
+                <span className="text-urgent line-through mr-1 text-xs">{fmtKg(legacy.wasted_kg)}</span>
+                <span className="text-brand-600">0 kg</span>
               </div>
             </div>
 
-            <div className="rounded-xl bg-white/10 p-3 backdrop-blur border border-white/10">
-              <div className="text-[11px] font-semibold text-amber-300 uppercase">High Need Missed</div>
-              <div className="font-display text-lg font-bold text-white mt-0.5">
-                <span className="text-rose-400 mr-1.5">{legacy.high_need_missed}</span>
-                <span className="text-slate-400">vs</span>
-                <span className="text-emerald-400 ml-1.5">0</span>
+            <div className="rounded-lg border border-line bg-slate-50/70 p-2.5">
+              <div className="text-[10px] font-medium text-ink-mute uppercase">High Need Missed</div>
+              <div className="text-sm sm:text-base font-bold text-ink mt-0.5">
+                <span className="text-urgent mr-1 text-xs">{legacy.high_need_missed}</span>
+                <span className="text-ink-mute text-xs">vs</span>
+                <span className="text-brand-600 ml-1">0</span>
               </div>
             </div>
 
-            <div className="col-span-2 sm:col-span-1 rounded-xl bg-white/10 p-3 backdrop-blur border border-white/10">
-              <div className="text-[11px] font-semibold text-emerald-300 uppercase">On-time Deliveries</div>
-              <div className="font-display text-lg font-bold text-emerald-400 mt-0.5">
-                100% Guaranteed
+            <div className="rounded-lg border border-line bg-slate-50/70 p-2.5">
+              <div className="text-[10px] font-medium text-ink-mute uppercase">On-Time Arrival</div>
+              <div className="text-sm sm:text-base font-bold text-brand-600 mt-0.5">
+                100%
               </div>
             </div>
           </div>
@@ -122,99 +122,99 @@ export default function Compare() {
       {/* Filter Toggle */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-bold uppercase tracking-wider text-ink-mute">View mode:</span>
-          <div className="flex rounded-lg bg-slate-100 p-0.5 text-xs font-semibold">
+          <span className="text-xs font-medium text-ink-soft">View:</span>
+          <div className="flex rounded border border-line bg-slate-50 p-0.5 text-xs font-medium">
             <button
               onClick={() => setFilterMode('all')}
-              className={`rounded-md px-3 py-1 transition ${
-                filterMode === 'all' ? 'bg-white text-ink shadow-sm font-bold' : 'text-ink-soft'
+              className={`rounded px-2.5 py-1 transition ${
+                filterMode === 'all' ? 'bg-white text-ink shadow-sm font-semibold' : 'text-ink-soft'
               }`}
             >
               All Matches
             </button>
             <button
               onClick={() => setFilterMode('issues')}
-              className={`rounded-md px-3 py-1 transition ${
-                filterMode === 'issues' ? 'bg-white text-rose-800 shadow-sm font-bold' : 'text-ink-soft'
+              className={`rounded px-2.5 py-1 transition ${
+                filterMode === 'issues' ? 'bg-white text-urgent shadow-sm font-semibold' : 'text-ink-soft'
               }`}
             >
               Highlight Flaws Only
             </button>
           </div>
         </div>
-        <span className="text-xs text-ink-mute">Click 'Re-run' anytime to compare again</span>
+        <span className="text-xs text-ink-mute">Click 'Re-run' anytime to refresh</span>
       </div>
 
       {/* Side-by-Side Analysis */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-5 lg:grid-cols-2">
         {/* LEFT COLUMN: THE OLD WAY */}
-        <section className="card p-5 border-rose-200/90 bg-rose-50/20 shadow-sm flex flex-col">
-          <div className="flex items-start justify-between gap-3 pb-3 border-b border-rose-100">
+        <section className="card p-5 border-urgent-border/80 bg-urgent-soft/20 flex flex-col">
+          <div className="flex items-start justify-between gap-3 pb-3 border-b border-urgent-border/50">
             <div>
-              <div className="flex items-center gap-2 text-rose-800 font-bold font-display text-lg">
-                <AlertTriangle className="h-5 w-5 text-rose-600 shrink-0" />
-                <span>The Old Way: Naive Proximity</span>
+              <div className="flex items-center gap-1.5 text-urgent font-semibold text-sm sm:text-base">
+                <AlertTriangle className="h-4 w-4 shrink-0" />
+                <span>The Status Quo: Naive Proximity</span>
               </div>
-              <p className="mt-1 text-xs text-ink-soft">
-                Greedily pairs the nearest open request without checking expiry time windows or hunger severity.
+              <p className="mt-0.5 text-xs text-ink-soft">
+                Greedily matches the closest request without checking perishable expiry or hunger urgency.
               </p>
             </div>
-            <span className="rounded-full bg-rose-100 px-2.5 py-0.5 text-[11px] font-bold text-rose-800 shrink-0">
+            <span className="rounded bg-urgent-soft px-2 py-0.5 text-[10px] font-semibold text-urgent border border-urgent-border shrink-0">
               High Waste
             </span>
           </div>
 
-          <div className="my-4 grid grid-cols-3 gap-2.5 text-center">
-            <div className="rounded-xl border border-rose-200 bg-white p-2.5">
-              <div className="text-[11px] font-semibold text-rose-700">Food Spoiled</div>
-              <div className="font-display text-lg font-bold text-rose-800">{fmtKg(legacy.wasted_kg)}</div>
+          <div className="my-3 grid grid-cols-3 gap-2 text-center">
+            <div className="rounded border border-urgent-border bg-white p-2">
+              <div className="text-[10px] font-medium text-urgent">Food Spoiled</div>
+              <div className="text-sm font-bold text-urgent">{fmtKg(legacy.wasted_kg)}</div>
             </div>
-            <div className="rounded-xl border border-rose-200 bg-white p-2.5">
-              <div className="text-[11px] font-semibold text-rose-700">Starving Missed</div>
-              <div className="font-display text-lg font-bold text-rose-800">{legacy.high_need_missed} shelters</div>
+            <div className="rounded border border-urgent-border bg-white p-2">
+              <div className="text-[10px] font-medium text-urgent">High Need Missed</div>
+              <div className="text-sm font-bold text-urgent">{legacy.high_need_missed} shelters</div>
             </div>
-            <div className="rounded-xl border border-slate-200 bg-white p-2.5">
-              <div className="text-[11px] font-semibold text-ink-soft">Unserved</div>
-              <div className="font-display text-lg font-bold text-ink">{legacy.unserved.length} requests</div>
+            <div className="rounded border border-line bg-white p-2">
+              <div className="text-[10px] font-medium text-ink-soft">Unserved</div>
+              <div className="text-sm font-bold text-ink">{legacy.unserved.length} requests</div>
             </div>
           </div>
 
-          <div className="flex-1 space-y-2 max-h-[460px] overflow-y-auto pr-1">
+          <div className="flex-1 space-y-2 max-h-[440px] overflow-y-auto pr-1">
             {legacyRows.map((r, i) => (
               <div
                 key={i}
-                className={`rounded-xl border p-3 text-xs transition ${
+                className={`rounded-lg border p-2.5 text-xs transition-all ${
                   r.late
-                    ? 'border-rose-300 bg-rose-50/80 shadow-sm'
-                    : 'border-slate-200 bg-white'
+                    ? 'border-urgent-border bg-urgent-soft/50'
+                    : 'border-line bg-white'
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-ink">{fmtKg(r.kg)}</span>
+                  <span className="font-semibold text-ink">{fmtKg(r.kg)}</span>
                   {r.late ? (
-                    <span className="inline-flex items-center gap-1 font-bold text-rose-700 bg-rose-100/90 px-2 py-0.5 rounded-full">
+                    <span className="inline-flex items-center gap-1 font-semibold text-urgent text-[11px]">
                       <XCircle className="h-3 w-3" /> Spoils Before Arrival
                     </span>
                   ) : (
-                    <span className="text-ink-mute font-medium">On-time</span>
+                    <span className="text-ink-mute text-[11px]">On-time</span>
                   )}
                 </div>
-                <div className="mt-1.5 flex items-center gap-1.5 font-medium text-ink">
+                <div className="mt-1 flex items-center gap-1.5 font-medium text-ink">
                   <span className="truncate">{r.donor}</span>
                   <ArrowRight className="h-3 w-3 shrink-0 text-slate-400" />
                   <span className="truncate">{r.receiver}</span>
                 </div>
-                <div className="mt-1 text-[11px] text-ink-mute">
-                  Distance: {r.km} km · Shelter Need Level: {r.need}/5 · Est. Arrival: {r.arrive}
+                <div className="mt-0.5 text-[10px] text-ink-mute">
+                  Distance: {r.km} km · Shelter Need: {r.need}/5 · Est. Arrival: {r.arrive}
                 </div>
               </div>
             ))}
           </div>
 
           {legacy.unserved.length > 0 && (
-            <div className="mt-4 pt-3 border-t border-rose-100 text-xs">
-              <div className="font-bold text-rose-900 mb-1">Left Starving / Overlooked:</div>
-              <p className="text-ink-soft leading-relaxed">
+            <div className="mt-3 pt-2.5 border-t border-urgent-border/50 text-xs">
+              <div className="font-semibold text-urgent text-[11px] mb-0.5">Shelters Overlooked:</div>
+              <p className="text-ink-soft text-[11px] leading-snug">
                 {legacy.unserved.map((u) => `${u.receiver} (Need: ${u.need}/5)`).join(' · ')}
               </p>
             </div>
@@ -222,18 +222,18 @@ export default function Compare() {
         </section>
 
         {/* RIGHT COLUMN: SMARTFEED OPTIMIZATION */}
-        <section className="card p-5 border-emerald-300 bg-emerald-50/20 shadow-sm flex flex-col">
-          <div className="flex items-start justify-between gap-3 pb-3 border-b border-emerald-100">
+        <section className="card p-5 border-brand-100 bg-brand-50/20 flex flex-col">
+          <div className="flex items-start justify-between gap-3 pb-3 border-b border-brand-100">
             <div>
-              <div className="flex items-center gap-2 text-emerald-800 font-bold font-display text-lg">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
+              <div className="flex items-center gap-1.5 text-brand-700 font-semibold text-sm sm:text-base">
+                <CheckCircle2 className="h-4 w-4 text-brand-600 shrink-0" />
                 <span>SmartFeed: Urgency & Need First</span>
               </div>
-              <p className="mt-1 text-xs text-ink-soft">
+              <p className="mt-0.5 text-xs text-ink-soft">
                 Mathematical optimization factoring expiry curves, batch split sizes, and critical hunger priorities.
               </p>
             </div>
-            <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800 shrink-0">
+            <span className="rounded bg-brand-50 px-2 py-0.5 text-[10px] font-semibold text-brand-700 border border-brand-100 shrink-0">
               Zero Waste
             </span>
           </div>
@@ -242,7 +242,7 @@ export default function Compare() {
             <div className="my-auto py-12">
               <EmptyState
                 title="SmartFeed matching not run yet"
-                text="Click the button below to compute optimal pairings and see the comparison."
+                text="Run matching to compute optimal pairings and compare against baseline."
                 action={
                   <Button className="btn-primary" loading={busy} onClick={run}>
                     Run SmartFeed
@@ -252,41 +252,41 @@ export default function Compare() {
             </div>
           ) : (
             <>
-              <div className="my-4 grid grid-cols-3 gap-2.5 text-center">
-                <div className="rounded-xl border border-emerald-200 bg-white p-2.5">
-                  <div className="text-[11px] font-semibold text-emerald-700">Food Delivered</div>
-                  <div className="font-display text-lg font-bold text-emerald-800">{fmtKg(sfKg)}</div>
+              <div className="my-3 grid grid-cols-3 gap-2 text-center">
+                <div className="rounded border border-brand-100 bg-white p-2">
+                  <div className="text-[10px] font-medium text-brand-700">Food Delivered</div>
+                  <div className="text-sm font-bold text-brand-700">{fmtKg(sfKg)}</div>
                 </div>
-                <div className="rounded-xl border border-emerald-200 bg-white p-2.5">
-                  <div className="text-[11px] font-semibold text-emerald-700">Food Spoiled</div>
-                  <div className="font-display text-lg font-bold text-emerald-800">0 kg</div>
+                <div className="rounded border border-brand-100 bg-white p-2">
+                  <div className="text-[10px] font-medium text-brand-700">Food Spoiled</div>
+                  <div className="text-sm font-bold text-brand-700">0 kg</div>
                 </div>
-                <div className="rounded-xl border border-emerald-200 bg-white p-2.5">
-                  <div className="text-[11px] font-semibold text-emerald-700">Shelters Fed</div>
-                  <div className="font-display text-lg font-bold text-emerald-800">{served.size} shelters</div>
+                <div className="rounded border border-brand-100 bg-white p-2">
+                  <div className="text-[10px] font-medium text-brand-700">Shelters Fed</div>
+                  <div className="text-sm font-bold text-brand-700">{served.size} shelters</div>
                 </div>
               </div>
 
-              <div className="flex-1 space-y-2 max-h-[460px] overflow-y-auto pr-1">
+              <div className="flex-1 space-y-2 max-h-[440px] overflow-y-auto pr-1">
                 {[...sf]
                   .sort((a, b) => b.priority_score - a.priority_score)
                   .map((x) => (
                     <div
                       key={x.match_id}
-                      className="rounded-xl border border-emerald-200/80 bg-white p-3 text-xs shadow-sm"
+                      className="rounded-lg border border-brand-100 bg-white p-2.5 text-xs shadow-card"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-ink">{fmtKg(x.allocated_kg)}</span>
-                        <span className="inline-flex items-center gap-1 font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full text-[11px]">
+                        <span className="font-semibold text-ink">{fmtKg(x.allocated_kg)}</span>
+                        <span className="inline-flex items-center gap-1 font-semibold text-brand-700 bg-brand-50 px-2 py-0.5 rounded text-[10px] border border-brand-100">
                           <CheckCircle2 className="h-3 w-3" /> Priority Score {Number(x.priority_score).toFixed(2)}
                         </span>
                       </div>
-                      <div className="mt-1.5 flex items-center gap-1.5 font-medium text-ink">
+                      <div className="mt-1 flex items-center gap-1.5 font-medium text-ink">
                         <span className="truncate">{x.donor_name}</span>
-                        <ArrowRight className="h-3 w-3 shrink-0 text-emerald-600" />
-                        <span className="truncate text-blue-700">{x.receiver_name}</span>
+                        <ArrowRight className="h-3 w-3 shrink-0 text-brand-500" />
+                        <span className="truncate text-info">{x.receiver_name}</span>
                       </div>
-                      <div className="mt-1 text-[11px] text-ink-mute">
+                      <div className="mt-0.5 text-[10px] text-ink-mute">
                         Food Type: {x.food_type} · Optimal Handover Window
                       </div>
                     </div>
@@ -294,9 +294,9 @@ export default function Compare() {
               </div>
 
               {results.unmatched?.length > 0 && (
-                <div className="mt-4 pt-3 border-t border-emerald-100 text-xs text-ink-soft">
-                  <div className="font-bold text-ink mb-1">Honest Surplus Leftover:</div>
-                  <p className="leading-relaxed">
+                <div className="mt-3 pt-2.5 border-t border-brand-100 text-xs text-ink-soft">
+                  <div className="font-semibold text-ink text-[11px] mb-0.5">Surplus Leftover:</div>
+                  <p className="text-[11px] leading-snug">
                     {results.unmatched.map((u) => `${u.item_name} (${u.reason})`).join(' · ')}
                   </p>
                 </div>

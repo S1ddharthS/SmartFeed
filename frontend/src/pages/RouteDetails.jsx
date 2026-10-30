@@ -48,7 +48,7 @@ export default function RouteDetails() {
 
   if (!routes.length) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 animate-fade-in">
         <PageHeader
           title="Vehicle Routes & Timelines"
           subtitle="Turn-by-turn dispatch itinerary for every driver and vehicle in the rescue network."
@@ -72,29 +72,29 @@ export default function RouteDetails() {
   const m = summary?.metrics
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       <PageHeader
         title="Vehicle Dispatch & Driver Timelines"
         subtitle={`${routes.length} active vehicles on the road · Delivering ${fmtKg(
           m?.food_delivered_kg
         )} with zero expiry violations.`}
         badge={
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800 border border-emerald-200">
-            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-700" /> Dispatch Finalized
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 border border-brand-100 px-2.5 py-0.5 text-xs font-semibold text-brand-700">
+            <CheckCircle2 className="h-3 w-3 text-brand-500" /> Dispatch Finalized
           </span>
         }
         actions={
           <div className="flex items-center gap-2">
-            <Button className="btn-secondary" loading={busy} onClick={plan}>
+            <Button className="btn-secondary text-xs sm:text-sm !py-1.5 !px-3" loading={busy} onClick={plan}>
               Re-optimize
             </Button>
             <button
-              className="btn-primary"
+              className="btn-primary text-xs sm:text-sm !py-1.5 !px-3.5"
               onClick={() => window.print()}
-              title="Print route manifest or export to PDF"
+              title="Print route manifest"
             >
               <Printer className="h-4 w-4" />
-              <span>Print / Download PDF</span>
+              <span>Print Manifest</span>
             </button>
           </div>
         }
@@ -128,23 +128,23 @@ export default function RouteDetails() {
             icon={Gauge}
             label="Average Fleet Load"
             value={`${m.avg_vehicle_utilization_percent}%`}
-            hint={`${m.split_delivery_count} multi-stop split deliveries`}
+            hint={`${m.split_delivery_count} split deliveries executed`}
             tone="leaf"
           />
         </div>
       )}
 
       {/* Vehicle Filter Selector Tabs */}
-      <div className="no-print flex items-center justify-between gap-4 flex-wrap border-b border-slate-200/80 pb-3">
-        <div className="flex flex-wrap items-center gap-2" role="tablist" aria-label="Vehicle selection">
+      <div className="no-print flex items-center justify-between gap-3 flex-wrap border-b border-line pb-3">
+        <div className="flex flex-wrap items-center gap-1.5" role="tablist" aria-label="Vehicle selection">
           <button
             role="tab"
             aria-selected={sel === 'all'}
             onClick={() => setSel('all')}
-            className={`rounded-xl px-4 py-2 text-xs sm:text-sm font-semibold transition ${
+            className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
               sel === 'all'
-                ? 'bg-slate-900 text-white shadow-sm font-bold'
-                : 'border border-slate-200 bg-white text-ink hover:bg-slate-50'
+                ? 'bg-brand-500 text-white shadow-sm'
+                : 'border border-line bg-white text-ink hover:bg-slate-50'
             }`}
           >
             All Vehicles ({routes.length})
@@ -159,11 +159,11 @@ export default function RouteDetails() {
                 role="tab"
                 aria-selected={isSelected}
                 onClick={() => setSel(String(r.vehicle_id))}
-                className="rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold transition border flex items-center gap-2"
+                className="rounded-lg px-2.5 py-1.5 text-xs font-semibold transition border flex items-center gap-1.5"
                 style={
                   isSelected
                     ? { background: vColor, color: '#fff', borderColor: vColor }
-                    : { background: '#fff', color: '#0f172a', borderColor: '#e2e8f0' }
+                    : { background: '#fff', color: '#172033', borderColor: '#E8EDF2' }
                 }
               >
                 <span
@@ -171,7 +171,7 @@ export default function RouteDetails() {
                   style={{ background: isSelected ? '#fff' : vColor }}
                 />
                 <span>Vehicle {r.vehicle_id}</span>
-                <span className={`text-[11px] ${isSelected ? 'opacity-80' : 'text-ink-mute'}`}>
+                <span className={`text-[10px] ${isSelected ? 'opacity-80' : 'text-ink-mute'}`}>
                   ({r.stops.length} stops)
                 </span>
               </button>
@@ -179,39 +179,39 @@ export default function RouteDetails() {
           })}
         </div>
 
-        <span className="text-xs text-ink-mute">Click a vehicle tab to focus its route</span>
+        <span className="text-xs text-ink-mute">Select vehicle to inspect manifest</span>
       </div>
 
-      {/* Interactive Map preview */}
+      {/* Map preview */}
       <div className="no-print card p-1 bg-white shadow-sm overflow-hidden">
-        <MapView depots={depots} routes={shown} height={380} />
+        <MapView depots={depots} routes={shown} height={360} />
       </div>
 
-      {/* Itinerary Timelines Grid */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      {/* Driver Timelines Grid */}
+      <div className="grid gap-5 lg:grid-cols-2">
         {shown.map((r) => (
           <RouteTimeline key={r.vehicle_id} route={r} />
         ))}
       </div>
 
-      {/* Honest Unserved Deliveries Notification (if any) */}
+      {/* Unserved Tasks if any */}
       {unserved.length > 0 && (
-        <div className="card border-amber-200 bg-amber-50/50 p-5 text-sm">
-          <div className="flex items-center gap-2 font-bold text-amber-900">
-            <RouteIcon className="h-5 w-5 text-amber-700" />
-            <span>Could not be routed in this cycle ({unserved.length} tasks)</span>
+        <div className="card border-warning-border bg-warning-soft/30 p-4 text-xs sm:text-sm">
+          <div className="flex items-center gap-2 font-semibold text-warning">
+            <RouteIcon className="h-4 w-4" />
+            <span>Unrouted in this cycle ({unserved.length} tasks)</span>
           </div>
           <p className="mt-1 text-xs text-ink-soft">
-            These tasks were matched by priority, but no active vehicle could reach both pickup and delivery without exceeding vehicle capacity or missing the expiry cutoff.
+            These tasks were matched by priority, but vehicle capacity limits or tight expiry time windows prevented scheduling on current shifts.
           </p>
-          <ul className="mt-3 space-y-2">
+          <ul className="mt-2.5 space-y-1.5">
             {unserved.map((u, i) => (
-              <li key={i} className="rounded-xl border border-amber-200 bg-white p-3 text-xs flex items-center justify-between">
+              <li key={i} className="rounded-lg border border-line bg-white p-2.5 text-xs flex items-center justify-between">
                 <div>
-                  <b className="text-ink">{u.donor_name} → {u.receiver_name}</b>
-                  <span className="text-ink-soft block mt-0.5">{fmtKg(u.quantity_kg)} food load</span>
+                  <span className="font-semibold text-ink">{u.donor_name} → {u.receiver_name}</span>
+                  <span className="text-ink-mute block text-[11px] mt-0.5">{fmtKg(u.quantity_kg)} load</span>
                 </div>
-                <span className="font-semibold text-amber-800 bg-amber-100 px-2.5 py-1 rounded-lg">
+                <span className="font-medium text-warning bg-warning-soft px-2 py-0.5 rounded border border-warning-border text-[11px]">
                   {u.reason}
                 </span>
               </li>

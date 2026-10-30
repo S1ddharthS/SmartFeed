@@ -16,11 +16,11 @@ const FOOD_TYPES = [
 ]
 
 const NEED = [
-  { v: 1, t: 'Low', d: 'Can wait 24h+', color: 'border-emerald-300 bg-emerald-50 text-emerald-800' },
-  { v: 2, t: 'Mild', d: 'Few hours slack', color: 'border-emerald-300 bg-emerald-50 text-emerald-800' },
-  { v: 3, t: 'Medium', d: 'Needed today', color: 'border-amber-300 bg-amber-50 text-amber-800' },
-  { v: 4, t: 'High', d: 'Impending gap', color: 'border-rose-300 bg-rose-50 text-rose-800' },
-  { v: 5, t: 'Critical', d: 'Going hungry now', color: 'border-rose-400 bg-rose-100 text-rose-900 ring-2 ring-rose-400' },
+  { v: 1, t: 'Low', d: 'Flexible 24h+', color: 'border-brand-200 bg-brand-50 text-brand-700' },
+  { v: 2, t: 'Mild', d: 'Few hours slack', color: 'border-brand-200 bg-brand-50 text-brand-700' },
+  { v: 3, t: 'Medium', d: 'Needed today', color: 'border-warning-border bg-warning-soft text-warning' },
+  { v: 4, t: 'High', d: 'Impending gap', color: 'border-urgent-border bg-urgent-soft text-urgent' },
+  { v: 5, t: 'Critical', d: 'Immediate hunger', color: 'border-urgent bg-urgent-soft text-urgent ring-1 ring-urgent' },
 ]
 
 const round15 = (ms) => new Date(Math.ceil(ms / 9e5) * 9e5)
@@ -81,7 +81,7 @@ export function DonateForm() {
         ...(user ? { owner: user.username } : {}),
       })
       rememberMine('donations', user, row.id)
-      toast('Surplus food registered! It will be scored for priority immediately.')
+      toast('Food donation registered! Scored for priority immediately.')
       nav('/donor')
     } catch (x) {
       toast(x.message, 'error')
@@ -91,33 +91,33 @@ export function DonateForm() {
   }
 
   return (
-    <form onSubmit={submit} className="mx-auto max-w-3xl space-y-6">
+    <form onSubmit={submit} className="mx-auto max-w-2xl space-y-5 animate-fade-in">
       <PageHeader
-        title="Register Food Surplus"
-        subtitle="Help food reach someone hungry before it spoils. Batches expiring sooner are dispatched first."
+        title="Donate Food Surplus"
+        subtitle="List available meals for dispatch. Items expiring sooner are prioritized by the routing engine."
         badge={
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800 border border-emerald-200">
-            <Package className="h-3.5 w-3.5 text-emerald-700" /> New Surplus Intake
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 border border-brand-100 px-2.5 py-0.5 text-xs font-semibold text-brand-700">
+            <Package className="h-3 w-3 text-brand-500" /> Donation Intake
           </span>
         }
         actions={
-          <Link to="/donor" className="btn-ghost">
+          <Link to="/donor" className="btn-secondary !py-1.5 !px-3 text-xs">
             Cancel
           </Link>
         }
       />
 
-      {/* SECTION 1: Donor & Food Type */}
-      <div className="card p-6 space-y-5">
-        <div className="border-b border-slate-100 pb-3">
-          <h2 className="font-display text-base font-bold text-ink">1. Organization & Food Category</h2>
-          <p className="text-xs text-ink-soft">Identify the food surplus to assign accurate shelf-life defaults.</p>
+      {/* SECTION 1: Organization & Category */}
+      <div className="card p-5 sm:p-6 space-y-4">
+        <div className="border-b border-line pb-3">
+          <h2 className="text-sm font-semibold text-ink">1. Organization & Food Category</h2>
+          <p className="text-xs text-ink-soft">Categorize surplus to apply safe perishability timelines.</p>
         </div>
 
         <Field label="Donor Organization or Venue" error={err.donor_name} required>
           <input
             className="input"
-            placeholder="e.g. Green Leaf Restaurant or Grand Ballroom Catering"
+            placeholder="e.g. Green Leaf Cafe or Grand Banquet Hall"
             value={f.donor_name}
             onChange={(e) => set('donor_name', e.target.value)}
           />
@@ -125,7 +125,7 @@ export function DonateForm() {
 
         <div>
           <span className="label">Food Category</span>
-          <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {FOOD_TYPES.map((o) => {
               const active = f.food_type === o.t
               return (
@@ -134,19 +134,19 @@ export function DonateForm() {
                   key={o.t}
                   onClick={() => pickType(o)}
                   aria-pressed={active}
-                  className={`rounded-xl border p-3 text-left transition ${
+                  className={`rounded-lg border p-3 text-left transition-all ${
                     active
-                      ? 'border-leaf-600 bg-leaf-50/80 shadow-sm ring-1 ring-leaf-500'
-                      : 'border-slate-200 bg-white hover:border-slate-300'
+                      ? 'border-brand-500 bg-brand-50/50 shadow-sm'
+                      : 'border-line bg-white hover:border-slate-300'
                   }`}
                 >
                   <div className="flex items-center gap-2">
-                    <span className="text-xl">{o.emoji}</span>
-                    <b className="text-xs font-bold text-ink">{o.t}</b>
+                    <span className="text-lg">{o.emoji}</span>
+                    <span className="text-xs font-semibold text-ink">{o.t}</span>
                   </div>
-                  <p className="mt-1 text-[11px] text-ink-soft line-clamp-2">{o.desc}</p>
-                  <div className="mt-2 text-[10px] font-bold uppercase tracking-wider text-leaf-800">
-                    Typical shelf: ~{o.hours}h
+                  <p className="mt-1 text-[11px] text-ink-soft leading-snug">{o.desc}</p>
+                  <div className="mt-2 text-[10px] font-medium uppercase tracking-wider text-brand-700">
+                    Shelf life: ~{o.hours}h
                   </div>
                 </button>
               )
@@ -157,7 +157,7 @@ export function DonateForm() {
         <Field
           label="Total Quantity (kg)"
           error={err.quantity_kg}
-          hint={f.quantity_kg ? `≈ ${Math.round(f.quantity_kg * 2.5)} meals enabled` : 'Roughly 2.5 meals per kilogram'}
+          hint={f.quantity_kg ? `≈ ${Math.round(f.quantity_kg * 2.5)} meals` : 'Estimated at ~2.5 meals per kg'}
           required
         >
           <input
@@ -173,15 +173,15 @@ export function DonateForm() {
         </Field>
       </div>
 
-      {/* SECTION 2: Timing & Deadlines */}
-      <div className="card p-6 space-y-5">
-        <div className="border-b border-slate-100 pb-3">
-          <h2 className="font-display text-base font-bold text-ink">2. Critical Timing & Pickup Window</h2>
-          <p className="text-xs text-ink-soft">Food safety requires pickup and delivery before the expiry cutoff.</p>
+      {/* SECTION 2: Expiry & Windows */}
+      <div className="card p-5 sm:p-6 space-y-4">
+        <div className="border-b border-line pb-3">
+          <h2 className="text-sm font-semibold text-ink">2. Food Safety & Pickup Window</h2>
+          <p className="text-xs text-ink-soft">The routing engine ensures pickup and arrival occur before safe expiration.</p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Food Ready From">
+          <Field label="Food Ready At" required>
             <input
               className="input"
               type="datetime-local"
@@ -189,7 +189,7 @@ export function DonateForm() {
               onChange={(e) => set('ready_time', e.target.value)}
             />
           </Field>
-          <Field label="Strict Expiry Cutoff (Safe Until)" error={err.expiry_time} required>
+          <Field label="Safe Until (Expiry)" error={err.expiry_time} required>
             <input
               className="input"
               type="datetime-local"
@@ -197,7 +197,10 @@ export function DonateForm() {
               onChange={(e) => set('expiry_time', e.target.value)}
             />
           </Field>
-          <Field label="Staff on-site for Handover From">
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="Pickup Window Start">
             <input
               className="input"
               type="time"
@@ -205,7 +208,7 @@ export function DonateForm() {
               onChange={(e) => set('pw_start', e.target.value)}
             />
           </Field>
-          <Field label="…Until Staff Leaves" error={err.pw_end} required>
+          <Field label="Pickup Window End" error={err.pw_end} required>
             <input
               className="input"
               type="time"
@@ -217,20 +220,24 @@ export function DonateForm() {
       </div>
 
       {/* SECTION 3: Location */}
-      <div className="card p-6 space-y-4">
-        <div className="border-b border-slate-100 pb-3">
-          <h2 className="font-display text-base font-bold text-ink">3. Pickup Location</h2>
-          <p className="text-xs text-ink-soft">Drop a pin or choose a landmark for driver navigation.</p>
+      <div className="card p-5 sm:p-6 space-y-3">
+        <div className="border-b border-line pb-2.5">
+          <h2 className="text-sm font-semibold text-ink">3. Pickup Location</h2>
+          <p className="text-xs text-ink-soft">Place a pin on the map or select a Bangalore landmark.</p>
         </div>
 
         <LocationPicker value={f.location} onChange={(p) => set('location', p)} />
-        {err.location && <p className="text-xs font-semibold text-urgent">{err.location}</p>}
+        {err.location && <p className="text-xs font-medium text-urgent">{err.location}</p>}
       </div>
 
-      {/* Submission CTA */}
-      <Button type="submit" loading={busy} className="btn-primary w-full !py-3.5 text-base shadow-md hover:shadow-lg">
-        Submit Food Surplus for Urgent Rescue
-      </Button>
+      <div className="flex items-center justify-end gap-3 pt-2">
+        <Link to="/donor" className="btn-secondary !py-2.5 !px-4">
+          Cancel
+        </Link>
+        <Button type="submit" loading={busy} className="btn-primary !py-2.5 !px-5 text-sm">
+          Donate Food
+        </Button>
+      </div>
     </form>
   )
 }
@@ -279,7 +286,7 @@ export function RequestForm() {
         ...(user ? { owner: user.username } : {}),
       })
       rememberMine('requests', user, row.id)
-      toast('Request submitted! High-urgency shelters are prioritized first.')
+      toast('Request submitted! Ranked by urgency in the dispatch pool.')
       nav('/receiver')
     } catch (x) {
       toast(x.message, 'error')
@@ -289,33 +296,33 @@ export function RequestForm() {
   }
 
   return (
-    <form onSubmit={submit} className="mx-auto max-w-3xl space-y-6">
+    <form onSubmit={submit} className="mx-auto max-w-2xl space-y-5 animate-fade-in">
       <PageHeader
         title="Request Food Rations"
-        subtitle="Let food rescue coordinators know your hunger severity, batch requirements, and operating hours."
+        subtitle="Indicate your shelter requirements, hunger urgency level, and staff availability."
         badge={
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-800 border border-blue-200">
-            <HeartHandshake className="h-3.5 w-3.5 text-blue-700" /> Beneficiary Request Intake
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-info-soft border border-info-border px-2.5 py-0.5 text-xs font-semibold text-info">
+            <HeartHandshake className="h-3 w-3 text-info" /> Beneficiary Intake
           </span>
         }
         actions={
-          <Link to="/receiver" className="btn-ghost">
+          <Link to="/receiver" className="btn-secondary !py-1.5 !px-3 text-xs">
             Cancel
           </Link>
         }
       />
 
-      {/* SECTION 1: Organization & Hunger Severity */}
-      <div className="card p-6 space-y-5">
-        <div className="border-b border-slate-100 pb-3">
-          <h2 className="font-display text-base font-bold text-ink">1. Recipient Organization & Hunger Priority</h2>
-          <p className="text-xs text-ink-soft">SmartFeed matches higher need levels ahead of flexible requests.</p>
+      {/* SECTION 1: Organization & Urgency */}
+      <div className="card p-5 sm:p-6 space-y-4">
+        <div className="border-b border-line pb-3">
+          <h2 className="text-sm font-semibold text-ink">1. Recipient Details & Hunger Severity</h2>
+          <p className="text-xs text-ink-soft">SmartFeed prioritizes higher urgency scores before flexible requests.</p>
         </div>
 
         <Field label="Shelter / Kitchen / Beneficiary Name" error={err.receiver_name} required>
           <input
             className="input"
-            placeholder="e.g. Hope Night Shelter or Seva Community Kitchen"
+            placeholder="e.g. Hope Night Shelter or Community Food Bank"
             value={f.receiver_name}
             onChange={(e) => set('receiver_name', e.target.value)}
           />
@@ -327,7 +334,7 @@ export function RequestForm() {
             type="number"
             min="1"
             step="0.5"
-            placeholder="e.g. 60"
+            placeholder="e.g. 50"
             inputMode="decimal"
             value={f.quantity_kg}
             onChange={(e) => set('quantity_kg', e.target.value)}
@@ -342,10 +349,10 @@ export function RequestForm() {
               return (
                 <label
                   key={n.v}
-                  className={`cursor-pointer rounded-xl border-2 p-2.5 text-center transition ${
+                  className={`cursor-pointer rounded-lg border p-2 text-center transition-all ${
                     active
-                      ? `${n.color} shadow-sm font-bold`
-                      : 'border-slate-200 bg-white hover:bg-slate-50 text-ink'
+                      ? `${n.color} shadow-sm font-semibold`
+                      : 'border-line bg-white hover:bg-slate-50 text-ink'
                   }`}
                 >
                   <input
@@ -355,9 +362,9 @@ export function RequestForm() {
                     checked={active}
                     onChange={() => set('need_level', n.v)}
                   />
-                  <span className="block font-display text-xl font-bold">{n.v}</span>
-                  <span className="block text-xs font-bold leading-tight">{n.t}</span>
-                  <span className="hidden text-[10px] text-ink-soft sm:block mt-0.5">{n.d}</span>
+                  <span className="block text-base font-bold">{n.v}</span>
+                  <span className="block text-[11px] font-semibold leading-tight">{n.t}</span>
+                  <span className="hidden text-[10px] text-ink-mute sm:block mt-0.5">{n.d}</span>
                 </label>
               )
             })}
@@ -366,14 +373,14 @@ export function RequestForm() {
       </div>
 
       {/* SECTION 2: Receiving Hours */}
-      <div className="card p-6 space-y-4">
-        <div className="border-b border-slate-100 pb-3">
-          <h2 className="font-display text-base font-bold text-ink">2. Receiving Time Window</h2>
-          <p className="text-xs text-ink-soft">When will volunteers or staff be ready to unload the vehicle?</p>
+      <div className="card p-5 sm:p-6 space-y-4">
+        <div className="border-b border-line pb-3">
+          <h2 className="text-sm font-semibold text-ink">2. Delivery Time Window</h2>
+          <p className="text-xs text-ink-soft">Specify hours when staff or volunteers are available to receive food.</p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Volunteers Ready From">
+          <Field label="Ready For Delivery From">
             <input
               className="input"
               type="time"
@@ -381,7 +388,7 @@ export function RequestForm() {
               onChange={(e) => set('dw_start', e.target.value)}
             />
           </Field>
-          <Field label="…Until (Receiving Closes)" error={err.dw_end} required>
+          <Field label="Delivery Window Closes" error={err.dw_end} required>
             <input
               className="input"
               type="time"
@@ -393,19 +400,24 @@ export function RequestForm() {
       </div>
 
       {/* SECTION 3: Address */}
-      <div className="card p-6 space-y-4">
-        <div className="border-b border-slate-100 pb-3">
-          <h2 className="font-display text-base font-bold text-ink">3. Drop-off Location</h2>
-          <p className="text-xs text-ink-soft">Place the pin directly on the delivery gate or entrance.</p>
+      <div className="card p-5 sm:p-6 space-y-3">
+        <div className="border-b border-line pb-2.5">
+          <h2 className="text-sm font-semibold text-ink">3. Drop-off Location</h2>
+          <p className="text-xs text-ink-soft">Select exact entrance or receiving gate coordinates.</p>
         </div>
 
         <LocationPicker value={f.location} onChange={(p) => set('location', p)} />
-        {err.location && <p className="text-xs font-semibold text-urgent">{err.location}</p>}
+        {err.location && <p className="text-xs font-medium text-urgent">{err.location}</p>}
       </div>
 
-      <Button type="submit" loading={busy} className="btn-primary w-full !py-3.5 text-base shadow-md hover:shadow-lg">
-        Submit Food Request
-      </Button>
+      <div className="flex items-center justify-end gap-3 pt-2">
+        <Link to="/receiver" className="btn-secondary !py-2.5 !px-4">
+          Cancel
+        </Link>
+        <Button type="submit" loading={busy} className="btn-primary !py-2.5 !px-5 text-sm">
+          Submit Food Request
+        </Button>
+      </div>
     </form>
   )
 }

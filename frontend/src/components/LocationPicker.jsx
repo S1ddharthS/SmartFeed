@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-import { LocateFixed, MapPin } from 'lucide-react'
+import { CheckCircle2, LocateFixed, MapPin } from 'lucide-react'
 import { BLR } from '../lib/utils'
 
 const PRESETS = [
@@ -32,7 +32,10 @@ export default function LocationPicker({ value, onChange }) {
 
   useEffect(() => {
     const start = value || BLR
-    map.current = L.map(el.current, { scrollWheelZoom: false }).setView([start.lat, start.lng], value ? 14 : 11)
+    map.current = L.map(el.current, { scrollWheelZoom: false }).setView(
+      [start.lat, start.lng],
+      value ? 14 : 11
+    )
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors',
     }).addTo(map.current)
@@ -53,7 +56,7 @@ export default function LocationPicker({ value, onChange }) {
     })
 
     return () => {
-      map.current.remove()
+      map.current?.remove()
       marker.current = null
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -71,44 +74,55 @@ export default function LocationPicker({ value, onChange }) {
     })
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2.5">
       {/* Quick Bangalore Landmark Presets */}
       <div className="flex flex-wrap items-center gap-1.5 text-xs">
-        <span className="text-ink-mute font-medium flex items-center gap-1 mr-1">
-          <MapPin className="h-3 w-3" /> Quick pin:
+        <span className="text-ink-soft font-medium flex items-center gap-1 mr-1">
+          <MapPin className="h-3 w-3 text-brand-600" /> Quick preset:
         </span>
-        {PRESETS.map((pr) => (
-          <button
-            key={pr.name}
-            type="button"
-            className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] font-semibold hover:border-leaf-400 hover:bg-leaf-50 text-ink"
-            onClick={() => {
-              place(pr.lat, pr.lng, true)
-              onChange({ lat: pr.lat, lng: pr.lng })
-            }}
-          >
-            {pr.name}
-          </button>
-        ))}
+        {PRESETS.map((pr) => {
+          const isSelected =
+            value &&
+            Math.abs(value.lat - pr.lat) < 0.001 &&
+            Math.abs(value.lng - pr.lng) < 0.001
+          return (
+            <button
+              key={pr.name}
+              type="button"
+              className={`rounded-lg border px-2.5 py-1 text-xs font-medium transition-all ${
+                isSelected
+                  ? 'border-brand-500 bg-brand-50 text-brand-700 font-semibold shadow-xs'
+                  : 'border-line bg-surface text-ink hover:border-slate-300 hover:bg-slate-50'
+              }`}
+              onClick={() => {
+                place(pr.lat, pr.lng, true)
+                onChange({ lat: pr.lat, lng: pr.lng })
+              }}
+            >
+              {pr.name}
+            </button>
+          )
+        })}
       </div>
 
-      {/* Map Element */}
+      {/* Map Container */}
       <div
         ref={el}
-        className="h-60 w-full overflow-hidden rounded-2xl border border-slate-200/90 shadow-sm"
+        className="h-60 w-full overflow-hidden rounded-xl border border-line shadow-card"
         role="application"
         aria-label="Click the map to set the pickup or delivery coordinates"
       />
 
       {/* Footer bar */}
       <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-ink-soft">
-        <span className="font-medium">
+        <span className="font-medium flex items-center gap-1.5">
           {value ? (
-            <span className="text-emerald-800 font-semibold">
-              ✓ Coordinates selected: {value.lat}, {value.lng} (drag pin to fine-tune)
+            <span className="text-brand-700 font-medium inline-flex items-center gap-1">
+              <CheckCircle2 className="h-3.5 w-3.5 text-brand-600" />
+              Pin placed at {value.lat}, {value.lng} (drag to adjust)
             </span>
           ) : (
-            'Tap anywhere on the map to place the location pin'
+            'Click on the map or drag the pin to set GPS coordinates'
           )}
         </span>
         <button
@@ -116,8 +130,8 @@ export default function LocationPicker({ value, onChange }) {
           className="btn-secondary !px-2.5 !py-1 text-xs"
           onClick={locate}
         >
-          <LocateFixed className="h-3.5 w-3.5" />
-          <span>My Current Location</span>
+          <LocateFixed className="h-3.5 w-3.5 text-ink-soft" />
+          <span>My Location</span>
         </button>
       </div>
     </div>
