@@ -9,12 +9,12 @@ import { colorForVehicle, fmtKg, mealsFromKg } from '../lib/utils'
 import { Button, EmptyState, ErrorState, PageHeader, PageLoader, StatCard } from '../components/ui'
 
 const ChartCard = ({ title, children, sub }) => (
-  <div className="card p-5 border-slate-200/90 shadow-sm transition hover:shadow-card-hover flex flex-col">
-    <div className="mb-4">
-      <h3 className="font-display text-base font-bold text-ink">{title}</h3>
+  <div className="card p-5 hover:border-slate-300 hover:shadow-card-hover transition-all flex flex-col">
+    <div className="mb-3">
+      <h3 className="text-sm font-semibold text-ink">{title}</h3>
       {sub && <p className="text-xs text-ink-soft mt-0.5">{sub}</p>}
     </div>
-    <div className="h-64 w-full mt-auto">{children}</div>
+    <div className="h-60 w-full mt-auto">{children}</div>
   </div>
 )
 
@@ -35,7 +35,7 @@ export default function Analytics() {
     try {
       await api.runMatching()
       await api.planRoutes()
-      toast('Fleet optimization executed! Loading analytics…')
+      toast('Optimization executed. Telemetry updated.')
       reload()
     } catch (e) {
       toast(e.message, 'error')
@@ -44,29 +44,29 @@ export default function Analytics() {
     }
   }
 
-  if (loading) return <PageLoader label="Aggregating network analytics…" />
+  if (loading) return <PageLoader label="Aggregating performance analytics…" />
   if (error) return <ErrorState message={error} onRetry={reload} />
 
   const { summary, routes, scores } = data
   if (!summary?.metrics || !routes.length) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 animate-fade-in">
         <PageHeader
           title="Impact & Efficiency Analytics"
           subtitle="Real-time telemetry on meals rescued, carbon offset, and vehicle logistics."
         />
         <EmptyState
-          title="No operational data to analyze yet"
+          title="No operational data available"
           text="Run matching and plan routes in the Control Center to generate optimization telemetry."
           icon={Leaf}
           action={
-            <div className="flex flex-wrap items-center justify-center gap-3">
+            <div className="flex flex-wrap items-center justify-center gap-2">
               <Button className="btn-primary" loading={busy} onClick={runPipelineNow}>
-                <Zap className="h-4 w-4 text-amber-300" />
-                <span>Auto-Generate Analytics (Run Simulation)</span>
+                <Zap className="h-4 w-4" />
+                <span>Plan Routes</span>
               </Button>
               <Link to="/admin" className="btn-secondary">
-                Go to Control Center
+                Control Center
               </Link>
             </div>
           }
@@ -88,19 +88,13 @@ export default function Analytics() {
     : []
 
   const pie = [
-    { name: 'Delivered', v: m.food_delivered_kg, c: '#16a34a' },
-    { name: 'Unrouted / Leftover', v: Math.max(0, m.food_requested_kg - m.food_delivered_kg), c: '#f59e0b' },
+    { name: 'Delivered', v: m.food_delivered_kg, c: '#16A36A' },
+    { name: 'Unrouted / Leftover', v: Math.max(0, m.food_requested_kg - m.food_delivered_kg), c: '#E9A23B' },
   ].filter((x) => x.v > 0)
 
   const util = routes.map((r) => ({
     name: `V${r.vehicle_id}`,
     util: r.capacity_utilization_percent,
-    id: r.vehicle_id,
-  }))
-
-  const dist = routes.map((r) => ({
-    name: `V${r.vehicle_id}`,
-    km: r.total_distance_km,
     id: r.vehicle_id,
   }))
 
@@ -112,17 +106,17 @@ export default function Analytics() {
   const band = Object.entries(bands).map(([name, v]) => ({
     name,
     v,
-    c: { Urgent: '#e11d48', Soon: '#d97706', Safe: '#16a34a' }[name],
+    c: { Urgent: '#E05252', Soon: '#E9A23B', Safe: '#16A36A' }[name],
   }))
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       <PageHeader
         title="Impact & Network Analytics"
         subtitle="Transparent evaluation of food rescued, carbon emission cuts, and multi-depot fleet performance."
         badge={
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800 border border-emerald-200">
-            <TrendingUp className="h-3.5 w-3.5 text-emerald-700" /> Real-time Performance Telemetry
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 border border-brand-100 px-2.5 py-0.5 text-xs font-semibold text-brand-700">
+            <TrendingUp className="h-3 w-3 text-brand-500" /> Performance Telemetry
           </span>
         }
       />
@@ -140,7 +134,7 @@ export default function Analytics() {
           icon={CheckCircle2}
           label="Expiry Compliance"
           value={`${m.expiry_compliance_percent}%`}
-          hint="Every delivery strictly before expiry"
+          hint="Deliveries completed before expiry"
           tone="leaf"
         />
         <StatCard
@@ -161,32 +155,31 @@ export default function Analytics() {
 
       {/* Advantage Banner vs Single-Depot Baseline */}
       {b && (
-        <div className="card p-5 border-emerald-300 bg-gradient-to-r from-emerald-50/90 via-white to-emerald-50/50 shadow-sm">
+        <div className="card p-5 border-brand-100 bg-brand-50/40">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <span className="rounded-md bg-leaf-700 text-white font-mono text-[11px] px-2 py-0.5 font-bold uppercase">
+                <span className="rounded bg-brand-100 text-brand-800 font-mono text-[11px] px-2 py-0.5 font-bold uppercase">
                   Multi-Depot Advantage
                 </span>
-                <h3 className="font-display text-base font-bold text-ink">
+                <h3 className="text-sm sm:text-base font-semibold text-ink">
                   Outperforming Single-Depot Baseline
                 </h3>
               </div>
               <p className="text-xs sm:text-sm text-ink-soft leading-relaxed max-w-2xl">
-                SmartFeed delivered <b className="text-emerald-800 font-bold">{b.additional_food_delivered_kg} kg more food</b> (+{b.food_delivery_gain_percent}%) with {b.distance_reduction_km > 0 ? `${b.distance_reduction_km} km less driving` : 'balanced travel'}.
-                <span className="block text-ink-mute mt-0.5">{b.multi_depot_advantage_notes}</span>
+                SmartFeed delivered <b className="text-brand-700">{b.additional_food_delivered_kg} kg more food</b> (+{b.food_delivery_gain_percent}%) with {b.distance_reduction_km > 0 ? `${b.distance_reduction_km} km less travel` : 'balanced travel'}.
               </p>
             </div>
 
-            <div className="flex items-center gap-3 shrink-0">
-              <div className="rounded-xl border border-emerald-200 bg-white p-3 text-center shadow-sm">
-                <div className="text-[10px] font-bold text-ink-mute uppercase">Food Saved Gain</div>
-                <div className="font-display text-lg font-bold text-leaf-800">+{b.food_delivery_gain_percent}%</div>
+            <div className="flex items-center gap-2.5 shrink-0">
+              <div className="rounded-lg border border-line bg-white p-2.5 text-center shadow-card">
+                <div className="text-[10px] font-medium text-ink-mute uppercase">Food Saved Gain</div>
+                <div className="text-base font-bold text-brand-600">+{b.food_delivery_gain_percent}%</div>
               </div>
               {b.distance_reduction_percent > 0 && (
-                <div className="rounded-xl border border-emerald-200 bg-white p-3 text-center shadow-sm">
-                  <div className="text-[10px] font-bold text-ink-mute uppercase">Km Saved</div>
-                  <div className="font-display text-lg font-bold text-leaf-800">-{b.distance_reduction_percent}%</div>
+                <div className="rounded-lg border border-line bg-white p-2.5 text-center shadow-card">
+                  <div className="text-[10px] font-medium text-ink-mute uppercase">Km Saved</div>
+                  <div className="text-base font-bold text-brand-600">-{b.distance_reduction_percent}%</div>
                 </div>
               )}
             </div>
@@ -195,19 +188,19 @@ export default function Analytics() {
       )}
 
       {/* Charts Grid */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-5 lg:grid-cols-2">
         {/* Chart 1: Baseline Comparison */}
         {b && (
           <ChartCard title="SmartFeed vs Baseline Architecture" sub="Comparing food delivered, distance, and fleet load">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={cmp} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#64748b' }} />
-                <YAxis tick={{ fontSize: 11, fill: '#64748b' }} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E8EDF2" />
+                <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#64748B' }} />
+                <YAxis tick={{ fontSize: 11, fill: '#64748B' }} />
                 <Tooltip />
                 <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />
-                <Bar dataKey="Baseline" fill="#94a3b8" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="SmartFeed" fill="#16a34a" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="Baseline" fill="#94A3B8" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="SmartFeed" fill="#16A36A" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </ChartCard>
@@ -217,7 +210,7 @@ export default function Analytics() {
         <ChartCard title="Food Allocation Breakdown" sub="Proportion of requested surplus successfully routed">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
-              <Pie data={pie} dataKey="v" nameKey="name" innerRadius={55} outerRadius={85} paddingAngle={4}>
+              <Pie data={pie} dataKey="v" nameKey="name" innerRadius={50} outerRadius={80} paddingAngle={4}>
                 {pie.map((p) => (
                   <Cell key={p.name} fill={p.c} />
                 ))}
@@ -229,12 +222,12 @@ export default function Analytics() {
         </ChartCard>
 
         {/* Chart 3: Vehicle Utilization */}
-        <ChartCard title="Peak Capacity Utilization by Vehicle" sub="Percentage of vehicle cargo space utilized">
+        <ChartCard title="Peak Capacity Utilization by Vehicle" sub="Percentage of vehicle payload capacity utilized">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={util} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-              <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#64748b' }} />
-              <YAxis domain={[0, 100]} unit="%" tick={{ fontSize: 11, fill: '#64748b' }} />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E8EDF2" />
+              <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#64748B' }} />
+              <YAxis domain={[0, 100]} unit="%" tick={{ fontSize: 11, fill: '#64748B' }} />
               <Tooltip formatter={(v) => `${v}%`} />
               <Bar dataKey="util" name="Peak Load %" radius={[4, 4, 0, 0]}>
                 {util.map((u) => (
@@ -246,12 +239,12 @@ export default function Analytics() {
         </ChartCard>
 
         {/* Chart 4: Urgency Distribution */}
-        <ChartCard title="Item Urgency Classification" sub="Items scored high are prioritized for earlier collection">
+        <ChartCard title="Item Urgency Distribution" sub="Items scored high are prioritized for earlier collection">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={band} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-              <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#64748b' }} />
-              <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: '#64748b' }} />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E8EDF2" />
+              <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#64748B' }} />
+              <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: '#64748B' }} />
               <Tooltip />
               <Bar dataKey="v" name="Active Batches" radius={[4, 4, 0, 0]}>
                 {band.map((x) => (
@@ -264,10 +257,10 @@ export default function Analytics() {
       </div>
 
       {/* Plan Quality Assurance Checklist */}
-      <div className="card p-6 border-slate-200/90 shadow-sm">
-        <div className="flex items-center gap-2 mb-4">
-          <ShieldCheck className="h-5 w-5 text-emerald-600" />
-          <h3 className="font-display text-lg font-bold text-ink">
+      <div className="card p-5 sm:p-6 space-y-3">
+        <div className="flex items-center gap-2 mb-2">
+          <ShieldCheck className="h-4 w-4 text-brand-600" />
+          <h3 className="text-sm sm:text-base font-semibold text-ink">
             Mathematical Feasibility & Food Safety Audit
           </h3>
         </div>
@@ -276,7 +269,7 @@ export default function Analytics() {
           {[
             {
               label: 'Capacity Limits',
-              desc: 'No vehicle ever exceeds payload limit',
+              desc: 'No vehicle exceeds max payload limit',
               ok: routes.every((r) => r.max_load_kg <= r.capacity_kg + 0.01),
             },
             {
@@ -286,7 +279,7 @@ export default function Analytics() {
             },
             {
               label: 'Full Allocation',
-              desc: 'All matched high-priority tasks routed',
+              desc: 'All high-priority tasks successfully routed',
               ok: m.unserved_count === 0,
             },
             {
@@ -297,21 +290,21 @@ export default function Analytics() {
           ].map((item) => (
             <div
               key={item.label}
-              className={`rounded-xl border p-4 transition ${
-                item.ok ? 'border-emerald-200 bg-emerald-50/30' : 'border-amber-200 bg-amber-50/30'
+              className={`rounded-lg border p-3.5 transition-all ${
+                item.ok ? 'border-brand-100 bg-brand-50/30' : 'border-warning-border bg-warning-soft/30'
               }`}
             >
               <div className="flex items-center gap-2">
                 <span
-                  className={`grid h-5 w-5 place-items-center rounded-full text-xs font-bold ${
-                    item.ok ? 'bg-emerald-600 text-white' : 'bg-amber-600 text-white'
+                  className={`grid h-4 w-4 place-items-center rounded-full text-[10px] font-bold ${
+                    item.ok ? 'bg-brand-500 text-white' : 'bg-warning text-white'
                   }`}
                 >
                   {item.ok ? '✓' : '!'}
                 </span>
-                <span className="font-bold text-sm text-ink">{item.label}</span>
+                <span className="font-semibold text-xs sm:text-sm text-ink">{item.label}</span>
               </div>
-              <p className="mt-1 text-xs text-ink-soft leading-relaxed">{item.desc}</p>
+              <p className="mt-1 text-xs text-ink-soft leading-snug">{item.desc}</p>
             </div>
           ))}
         </div>

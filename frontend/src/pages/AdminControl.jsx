@@ -7,11 +7,6 @@ import {
   ChevronUp,
   Clock,
   ExternalLink,
-  Filter,
-  Gauge,
-  HelpCircle,
-  Info,
-  Layers,
   MapPin,
   Package,
   PlayCircle,
@@ -37,7 +32,6 @@ import {
   PageLoader,
   StatCard,
   UrgencyBadge,
-  WorkflowSteps,
 } from '../components/ui'
 import MapView from '../components/MapView'
 
@@ -80,11 +74,11 @@ export default function AdminControl() {
       setPlan((p) =>
         summary && routes?.length
           ? {
-              routes,
-              metrics: summary.metrics,
-              unserved_tasks: summary.unserved_tasks,
-              baseline_comparison: summary.baseline_comparison,
-            }
+            routes,
+            metrics: summary.metrics,
+            unserved_tasks: summary.unserved_tasks,
+            baseline_comparison: summary.baseline_comparison,
+          }
           : p
       )
       setErr('')
@@ -119,8 +113,7 @@ export default function AdminControl() {
         return api.runMatching()
       },
       (r) =>
-        `Matched ${r.matches_count} allocations (${fmtKg(r.total_allocated_kg)}) prioritizing urgency in ${
-          r.execution_time_ms
+        `Matched ${r.matches_count} pairings (${fmtKg(r.total_allocated_kg)}) in ${r.execution_time_ms
         } ms`
     )
 
@@ -128,7 +121,7 @@ export default function AdminControl() {
     const r = await act(
       'plan',
       () => api.planRoutes(),
-      (x) => `Successfully planned ${x.routes.length} vehicle routes for ${fmtKg(x.metrics.food_delivered_kg)}`
+      (x) => `Generated ${x.routes.length} vehicle routes for ${fmtKg(x.metrics.food_delivered_kg)}`
     )
     if (r) {
       setPlan(r)
@@ -143,7 +136,7 @@ export default function AdminControl() {
       const planRes = await api.planRoutes()
       setPlan(planRes)
       setActiveTab('fleet')
-      toast(`Complete pipeline dispatched! ${matchRes.matches_count} matches & ${planRes.routes.length} vehicle routes.`)
+      toast(`Dispatched: ${matchRes.matches_count} matches and ${planRes.routes.length} vehicle routes.`)
       await load()
     } catch (e) {
       toast(e.message, 'error')
@@ -157,19 +150,19 @@ export default function AdminControl() {
     const now = new Date(nowMs)
     const nd = urgentDrop
       ? {
-          donor_name: 'Emergency Drop – Central Kitchen',
-          food_type: 'Cooked meals',
-          quantity_kg: 60,
-          location: { lat: 12.9716, lng: 77.6101 },
-          ready_time: `${toLocalInput(now)}:00`,
-          expiry_time: `${toLocalInput(new Date(nowMs + 2.5 * 3.6e6))}:00`,
-          pickup_window: { start: fromMin(now.getHours() * 60 + now.getMinutes()), end: '23:00' },
-        }
+        donor_name: 'Emergency Drop – Central Kitchen',
+        food_type: 'Cooked meals',
+        quantity_kg: 60,
+        location: { lat: 12.9716, lng: 77.6101 },
+        ready_time: `${toLocalInput(now)}:00`,
+        expiry_time: `${toLocalInput(new Date(nowMs + 2.5 * 3.6e6))}:00`,
+        pickup_window: { start: fromMin(now.getHours() * 60 + now.getMinutes()), end: '23:00' },
+      }
       : undefined
     const r = await act(
       'plan',
       () => api.replan({ disabled_vehicle_ids: offline, new_donation: nd }),
-      (x) => `Dynamic re-planning complete with ${x.replanned_event?.active_fleet_size ?? '?'} active vehicles`
+      (x) => `Dynamic re-planning complete (${x.replanned_event?.active_fleet_size ?? '?'} active vehicles)`
     )
     if (r) {
       setPlan(r)
@@ -185,7 +178,7 @@ export default function AdminControl() {
         setOffline([])
         return api.seed()
       },
-      () => 'Demo dataset successfully reset to initial state'
+      () => 'Demo dataset reset to initial state'
     )
 
   const scoreMap = useMemo(
@@ -199,7 +192,7 @@ export default function AdminControl() {
 
   const onSelect = useCallback((s) => setSel(s), [])
 
-  if (!d && !err) return <PageLoader label="Initializing SmartFeed Control Center…" />
+  if (!d && !err) return <PageLoader label="Initializing Control Center…" />
   if (err && !d) return <ErrorState message={err} onRetry={load} />
 
   const matched = (d.results?.matches_count || 0) > 0
@@ -225,101 +218,100 @@ export default function AdminControl() {
   const urgentCount = [...d.scores.donations, ...d.scores.requests].filter((s) => s.urgency_score >= 0.6).length
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       {/* Page Header with Action Bar */}
       <PageHeader
-        title="Rescue Operations Center"
-        subtitle="Live automated dispatch: Real-time urgency scoring, intelligent split matching, and multi-depot fleet routing."
+        title="Operations Control Center"
+        subtitle="Manage live intake, algorithmic urgency matching, and multi-depot fleet dispatch."
         badge={
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-leaf-100 px-3 py-1 text-xs font-bold text-leaf-800 border border-leaf-200">
-            <Sparkles className="h-3.5 w-3.5 text-leaf-700" /> Automated Optimization Engine
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 border border-brand-100 px-2.5 py-0.5 text-xs font-semibold text-brand-700">
+            <Sparkles className="h-3 w-3 text-brand-500" /> Dispatch Engine
           </span>
         }
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => setShowClockSlider(!showClockSlider)}
-              className={`btn border text-xs sm:text-sm ${
-                showClockSlider ? 'bg-amber-50 border-amber-300 text-amber-900' : 'border-slate-200 bg-white text-ink-soft hover:bg-slate-50'
-              }`}
-              title="Toggle preview clock simulation"
+              className={`btn-secondary text-xs sm:text-sm !py-1.5 !px-3 ${showClockSlider ? 'bg-warning-soft border-warning-border text-warning' : ''
+                }`}
+              title="Toggle time of day simulation"
             >
-              <Clock className="h-4 w-4 text-amber-600" />
-              <span>Clock: {live ? 'Real Clock' : fromMin(demoMin)}</span>
-              {showClockSlider ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+              <Clock className="h-3.5 w-3.5 text-warning" />
+              <span>Clock: {live ? 'Live' : fromMin(demoMin)}</span>
+              {showClockSlider ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
             </button>
 
             <Button
-              className="btn-secondary text-xs sm:text-sm"
+              className="btn-secondary text-xs sm:text-sm !py-1.5 !px-3"
               disabled={!routes.length}
               onClick={() => setReplanOpen(true)}
-              title="Simulate vehicle breakdown or unexpected surplus"
+              title="Simulate vehicle breakdown or emergency drop"
             >
-              <RefreshCw className="h-4 w-4 text-ink-soft" />
-              <span>Simulate Disruption</span>
+              <RefreshCw className="h-3.5 w-3.5 text-ink-soft" />
+              <span>Simulate Issue</span>
             </Button>
 
             <Button
-              className="btn-ghost text-xs text-ink-mute hover:text-ink !px-2.5"
+              className="btn-ghost text-xs text-ink-mute hover:text-ink !px-2.5 !py-1.5"
               loading={busy === 'reset'}
               onClick={reset}
-              title="Reset all demo data to seed status"
+              title="Reset data to default state"
             >
-              <RotateCcw className="h-3.5 w-3.5" />
+              <RotateCcw className="h-3 w-3" />
               <span>Reset</span>
             </Button>
           </div>
         }
       />
 
-      {/* Clock Simulation Drawer (collapsible to avoid clutter) */}
+      {/* Clock Simulation Drawer */}
       {showClockSlider && (
-        <div className="card p-5 border-amber-200/80 bg-gradient-to-r from-amber-50/70 via-white to-amber-50/40 shadow-sm animate-in slide-in-from-top-2">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="card p-4 sm:p-5 border-warning-border/80 bg-warning-soft/30 animate-in slide-in-from-top-1">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <div className="flex items-center gap-2 font-display font-bold text-base text-amber-950">
-                <Clock className="h-5 w-5 text-amber-600" />
-                <span>Simulated Time of Day</span>
-                <span className="rounded-lg bg-amber-200/70 px-2.5 py-0.5 font-mono text-sm font-bold text-amber-900">
+              <div className="flex items-center gap-2 font-semibold text-xs sm:text-sm text-ink">
+                <Clock className="h-4 w-4 text-warning" />
+                <span>Simulated Time of Day:</span>
+                <span className="rounded bg-white px-2 py-0.5 font-mono text-xs font-bold text-ink border border-line">
                   {live ? new Date(nowMs).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : fromMin(demoMin)}
                 </span>
               </div>
               <p className="mt-1 text-xs text-ink-soft max-w-xl">
-                As the afternoon clock advances, cooked meals and banquet trays near their expiry deadline, causing their urgency score to rise and prioritizing them for immediate vehicle collection.
+                As the clock advances toward afternoon and evening, shelf-life deadlines shorten and urgency scores automatically rise.
               </p>
             </div>
 
             {/* Quick Presets */}
             {!live && (
-              <div className="flex items-center gap-2 text-xs">
-                <span className="text-ink-mute font-medium">Quick jump:</span>
+              <div className="flex items-center gap-1.5 text-xs">
+                <span className="text-ink-mute text-[11px]">Preset:</span>
                 <button
                   type="button"
-                  className="rounded-lg border border-slate-200 bg-white px-2 py-1 font-semibold hover:border-amber-300 hover:bg-amber-50 text-ink"
+                  className="rounded border border-line bg-white px-2 py-1 text-xs font-medium hover:bg-slate-50 text-ink"
                   onClick={() => setDemoMin(10 * 60)}
                 >
-                  10:00 AM (Morning)
+                  10:00 AM
                 </button>
                 <button
                   type="button"
-                  className="rounded-lg border border-slate-200 bg-white px-2 py-1 font-semibold hover:border-amber-300 hover:bg-amber-50 text-ink"
+                  className="rounded border border-line bg-white px-2 py-1 text-xs font-medium hover:bg-slate-50 text-ink"
                   onClick={() => setDemoMin(13 * 60 + 30)}
                 >
-                  1:30 PM (Lunch Surplus)
+                  1:30 PM
                 </button>
                 <button
                   type="button"
-                  className="rounded-lg border border-slate-200 bg-white px-2 py-1 font-semibold hover:border-amber-300 hover:bg-amber-50 text-ink"
+                  className="rounded border border-line bg-white px-2 py-1 text-xs font-medium hover:bg-slate-50 text-ink"
                   onClick={() => setDemoMin(18 * 60)}
                 >
-                  6:00 PM (Dinner Rush)
+                  6:00 PM
                 </button>
               </div>
             )}
           </div>
 
-          <div className="mt-4 flex items-center gap-4">
-            <span className="text-xs font-bold text-ink-mute">08:00</span>
+          <div className="mt-3 flex items-center gap-3">
+            <span className="text-[11px] font-medium text-ink-mute">08:00</span>
             <input
               type="range"
               min={8 * 60}
@@ -328,61 +320,61 @@ export default function AdminControl() {
               value={demoMin}
               disabled={live}
               onChange={(e) => setDemoMin(Number(e.target.value))}
-              className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-amber-200 accent-amber-600 focus:outline-none"
+              className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-slate-200 accent-warning focus:outline-none"
               aria-label="Preview time slider"
             />
-            <span className="text-xs font-bold text-ink-mute">22:00</span>
+            <span className="text-[11px] font-medium text-ink-mute">22:00</span>
           </div>
         </div>
       )}
 
-      {/* Guided 3-Step Action Hero */}
-      <div className="card overflow-hidden border-leaf-200/90 bg-gradient-to-br from-emerald-50/60 via-white to-leaf-50/30 p-5 shadow-sm">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-          <div className="flex-1 space-y-2">
+      {/* Guided 3-Step Action Workflow */}
+      <div className="card p-4 sm:p-5 border-line bg-white">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div className="flex-1 space-y-1">
             <div className="flex items-center gap-2">
-              <span className="rounded-md bg-leaf-700 text-white font-mono text-xs px-2 py-0.5 font-bold">
-                STAGE {currentStage} OF 3
+              <span className="rounded bg-brand-50 border border-brand-100 text-brand-700 font-mono text-[11px] px-2 py-0.5 font-bold uppercase">
+                Stage {currentStage} / 3
               </span>
-              <h2 className="font-display text-lg font-bold text-ink">
-                {currentStage === 1 && 'Step 1: Raw Food Surplus & Hunger Needs Intake'}
-                {currentStage === 2 && 'Step 2: Optimal Pairing Calculated (Ready to Route)'}
-                {currentStage === 3 && 'Step 3: Fleet Routes Dispatched & Optimized'}
+              <h2 className="text-sm sm:text-base font-semibold text-ink">
+                {currentStage === 1 && 'Intake & Urgency Scoring'}
+                {currentStage === 2 && 'Matching Complete — Ready to Dispatch'}
+                {currentStage === 3 && 'Multi-Depot Fleet Optimized & En Route'}
               </h2>
             </div>
-            <p className="text-xs sm:text-sm text-ink-soft leading-relaxed max-w-3xl">
+            <p className="text-xs text-ink-soft leading-relaxed max-w-2xl">
               {currentStage === 1 &&
-                'Every batch of surplus food and hunger request is continuously evaluated on expiry time, quantity, and hunger severity. Click below to compute optimal non-wasteful pairings.'}
+                'All surplus donations and shelter requests are scored in real time. Click 1-Click Auto-Dispatch to run matching and fleet routing together.'}
               {currentStage === 2 &&
-                `Matching complete! Found ${d.results?.matches_count} optimal pairings (${fmtKg(
+                `Generated ${d.results?.matches_count} optimal pairings (${fmtKg(
                   d.results?.total_allocated_kg
-                )}). Next, dispatch vehicles across multi-depots to generate real turn-by-turn timelines.`}
+                )}). Dispatch vehicle fleet across Bangalore hubs to generate route timelines.`}
               {currentStage === 3 &&
                 `Active fleet running: ${routes.length} vehicles delivering ${fmtKg(
                   m?.food_delivered_kg
-                )} across Bangalore hubs with 100% expiry compliance.`}
+                )} across urban hubs with 100% expiry compliance.`}
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+          <div className="flex flex-wrap items-center gap-2 shrink-0">
             {currentStage === 1 && (
               <>
                 <Button
-                  className="btn-primary !px-5 !py-3 shadow-md hover:shadow-lg text-sm bg-gradient-to-r from-emerald-600 to-leaf-700"
+                  className="btn-primary !px-4 !py-2 text-xs sm:text-sm"
                   loading={busy === 'full'}
                   onClick={runFullPipeline}
                   title="Run matching and plan multi-depot routes in one step"
                 >
-                  <Zap className="h-5 w-5 text-amber-300" />
-                  <span>1-Click Auto-Dispatch (Match + Route)</span>
+                  <Zap className="h-4 w-4" />
+                  <span>Dispatch Fleet</span>
                 </Button>
                 <Button
-                  className="btn-secondary !px-3.5 !py-3 text-xs"
+                  className="btn-secondary !px-3 !py-2 text-xs"
                   loading={busy === 'match'}
                   onClick={runMatching}
                 >
-                  <PlayCircle className="h-4 w-4" />
-                  <span>Step 1: Match Only</span>
+                  <PlayCircle className="h-3.5 w-3.5" />
+                  <span>Match</span>
                 </Button>
               </>
             )}
@@ -390,38 +382,38 @@ export default function AdminControl() {
             {currentStage === 2 && (
               <>
                 <Button
-                  className="btn-primary !px-5 !py-3 shadow-md hover:shadow-lg text-sm bg-blue-600 hover:bg-blue-700"
+                  className="btn-primary !px-4 !py-2 text-xs sm:text-sm"
                   loading={busy === 'plan'}
                   onClick={planRoutes}
                 >
-                  <RouteIcon className="h-5 w-5" />
-                  <span>Plan Fleet Routes & Timelines</span>
+                  <RouteIcon className="h-4 w-4" />
+                  <span>Plan Routes</span>
                 </Button>
                 <Button
-                  className="btn-secondary text-xs"
+                  className="btn-secondary !px-3 !py-2 text-xs"
                   loading={busy === 'match'}
                   onClick={runMatching}
                 >
                   <RotateCcw className="h-3.5 w-3.5" />
-                  <span>Re-run Matches</span>
+                  <span>Match Again</span>
                 </Button>
               </>
             )}
 
             {currentStage === 3 && (
               <div className="flex items-center gap-2">
-                <Link to="/admin/routes" className="btn-primary !px-4 !py-2.5 text-xs sm:text-sm">
+                <Link to="/admin/routes" className="btn-primary !px-3.5 !py-2 text-xs sm:text-sm">
                   <Truck className="h-4 w-4" />
-                  <span>View Driver Timelines</span>
+                  <span>View Routes</span>
                 </Link>
                 <Button
-                  className="btn-secondary text-xs"
+                  className="btn-secondary !px-3 !py-2 text-xs"
                   loading={busy === 'match'}
                   onClick={runMatching}
                   title="Recalculate matches from scratch"
                 >
                   <RotateCcw className="h-3.5 w-3.5" />
-                  <span>Re-match</span>
+                  <span>Match Again</span>
                 </Button>
               </div>
             )}
@@ -435,7 +427,7 @@ export default function AdminControl() {
           icon={Package}
           label="Open Donations"
           value={d.scores.donations.length}
-          hint={`${fmtKg(d.donations.reduce((s, x) => s + x.remaining_kg, 0))} food surplus`}
+          hint={`${fmtKg(d.donations.reduce((s, x) => s + x.remaining_kg, 0))} total surplus`}
           tone="leaf"
         />
         <StatCard
@@ -454,97 +446,92 @@ export default function AdminControl() {
         />
         <StatCard
           icon={Truck}
-          label="Active Routes"
+          label="Dispatched Routes"
           value={routes.length}
           hint={m ? `${fmtKg(m.food_delivered_kg)} scheduled` : 'Not planned yet'}
           tone="amber"
         />
       </div>
 
-      {/* Main Workspace: 2-Column Uncluttered Layout */}
+      {/* Main Workspace Layout */}
       <div className="grid gap-6 lg:grid-cols-12 items-start">
-        {/* Left Column: Interactive Tabbed Panel (Donations / Matches / Fleet) */}
-        <div className="lg:col-span-5 space-y-4">
-          {/* Main Workspace Navigation Pills */}
-          <div className="card p-1.5 flex gap-1 bg-slate-100/80 border-slate-200">
+        {/* Left Column: Intake / Matches / Fleet Tabs */}
+        <div className="lg:col-span-5 space-y-3">
+          {/* Workspace Tabs */}
+          <div className="card p-1 flex gap-1 bg-slate-50 border-line">
             <button
               onClick={() => setActiveTab('intake')}
-              className={`flex-1 py-2 px-3 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-1.5 ${
-                activeTab === 'intake'
-                  ? 'bg-white text-ink shadow-sm font-bold'
-                  : 'text-ink-soft hover:text-ink hover:bg-white/50'
-              }`}
+              className={`flex-1 py-1.5 px-2.5 rounded text-xs font-semibold transition flex items-center justify-center gap-1.5 ${activeTab === 'intake'
+                  ? 'bg-white text-ink shadow-sm'
+                  : 'text-ink-soft hover:text-ink'
+                }`}
             >
-              <Package className="h-4 w-4 text-leaf-700" />
+              <Package className="h-3.5 w-3.5 text-brand-600" />
               <span>Surplus & Needs</span>
             </button>
             <button
               onClick={() => setActiveTab('matches')}
-              className={`flex-1 py-2 px-3 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-1.5 ${
-                activeTab === 'matches'
-                  ? 'bg-white text-ink shadow-sm font-bold'
-                  : 'text-ink-soft hover:text-ink hover:bg-white/50'
-              }`}
+              className={`flex-1 py-1.5 px-2.5 rounded text-xs font-semibold transition flex items-center justify-center gap-1.5 ${activeTab === 'matches'
+                  ? 'bg-white text-ink shadow-sm'
+                  : 'text-ink-soft hover:text-ink'
+                }`}
             >
-              <Zap className="h-4 w-4 text-blue-600" />
+              <Zap className="h-3.5 w-3.5 text-info" />
               <span>Matches ({d.results?.matches_count || 0})</span>
             </button>
             <button
               onClick={() => setActiveTab('fleet')}
-              className={`flex-1 py-2 px-3 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-1.5 ${
-                activeTab === 'fleet'
-                  ? 'bg-white text-ink shadow-sm font-bold'
-                  : 'text-ink-soft hover:text-ink hover:bg-white/50'
-              }`}
+              className={`flex-1 py-1.5 px-2.5 rounded text-xs font-semibold transition flex items-center justify-center gap-1.5 ${activeTab === 'fleet'
+                  ? 'bg-white text-ink shadow-sm'
+                  : 'text-ink-soft hover:text-ink'
+                }`}
             >
-              <Truck className="h-4 w-4 text-amber-600" />
+              <Truck className="h-3.5 w-3.5 text-warning" />
               <span>Fleet ({routes.length})</span>
             </button>
           </div>
 
-          {/* TAB 1: Intake (Donations & Requests) */}
+          {/* TAB 1: Intake */}
           {activeTab === 'intake' && (
-            <div className="card p-4 space-y-3">
+            <div className="card p-3.5 space-y-3">
               <div className="flex items-center justify-between gap-2">
-                <div className="flex rounded-lg bg-slate-100 p-0.5 text-xs font-semibold">
+                <div className="flex rounded border border-line bg-slate-50 p-0.5 text-xs font-medium">
                   <button
                     onClick={() => setIntakeFilter('donations')}
-                    className={`rounded-md px-3 py-1.5 transition ${
-                      intakeFilter === 'donations' ? 'bg-white text-leaf-900 shadow-sm font-bold' : 'text-ink-soft'
-                    }`}
+                    className={`rounded px-2.5 py-1 transition ${intakeFilter === 'donations' ? 'bg-white text-ink shadow-sm font-semibold' : 'text-ink-soft'
+                      }`}
                   >
                     Donors ({d.scores.donations.length})
                   </button>
                   <button
                     onClick={() => setIntakeFilter('requests')}
-                    className={`rounded-md px-3 py-1.5 transition ${
-                      intakeFilter === 'requests' ? 'bg-white text-leaf-900 shadow-sm font-bold' : 'text-ink-soft'
-                    }`}
+                    className={`rounded px-2.5 py-1 transition ${intakeFilter === 'requests' ? 'bg-white text-ink shadow-sm font-semibold' : 'text-ink-soft'
+                      }`}
                   >
-                    Receivers ({d.scores.requests.length})
+                    Shelters ({d.scores.requests.length})
                   </button>
                 </div>
-                <span className="text-[11px] text-ink-mute">Sorted by highest urgency</span>
+                <span className="text-[11px] text-ink-mute">Highest urgency first</span>
               </div>
 
               {/* Search filter */}
               <div className="relative">
-                <Search className="absolute left-3 top-2.5 h-4 w-4 text-ink-mute" />
+                <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-ink-mute" />
                 <input
                   type="text"
-                  placeholder={`Search ${intakeFilter}...`}
+                  placeholder={`Filter ${intakeFilter}…`}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="input !pl-9 !py-2 text-xs"
+                  className="input !pl-8 !py-1.5 text-xs"
                 />
               </div>
 
-              {/* Scrollable Ranked Items */}
-              <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
+              {/* Items List */}
+              <div className="space-y-2 max-h-[460px] overflow-y-auto pr-1">
                 {rankedIntake.length === 0 ? (
                   <EmptyState
-                    title="No items found"
-                    text="No entries match the current filter or all items have been fulfilled."
+                    title="No entries found"
+                    text="No items match your search filter."
                   />
                 ) : (
                   rankedIntake.map((s, idx) => {
@@ -561,39 +548,36 @@ export default function AdminControl() {
                             item: src,
                           })
                         }
-                        className={`w-full rounded-xl border p-3.5 text-left transition-all ${
-                          isSelected
-                            ? 'border-leaf-600 bg-leaf-50/60 ring-2 ring-leaf-200'
-                            : 'border-slate-200 bg-white hover:border-leaf-300 hover:shadow-sm'
-                        }`}
+                        className={`w-full rounded-lg border p-3 text-left transition-all ${isSelected
+                            ? 'border-brand-500 bg-brand-50/40 shadow-sm'
+                            : 'border-line bg-white hover:border-slate-300'
+                          }`}
                       >
                         <div className="flex items-start justify-between gap-2">
-                          <div className="flex items-center gap-2">
-                            <span className="grid h-5 w-5 place-items-center rounded-full bg-slate-100 text-[11px] font-bold text-ink-mute">
-                              {idx + 1}
-                            </span>
-                            <span className="font-bold text-ink text-sm leading-tight">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[11px] font-mono text-ink-mute">#{idx + 1}</span>
+                            <span className="font-semibold text-ink text-xs sm:text-sm truncate max-w-[180px]">
                               {s.donor_name || s.receiver_name}
                             </span>
                           </div>
                           <UrgencyBadge score={s.urgency_score} />
                         </div>
 
-                        <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-ink-soft">
-                          <span className="font-semibold text-ink bg-slate-100 px-2 py-0.5 rounded-md">
+                        <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-xs text-ink-soft">
+                          <span className="font-semibold text-ink bg-slate-50 px-1.5 py-0.5 rounded border border-line text-[11px]">
                             {fmtKg(s.quantity_kg)}
                           </span>
                           {intakeFilter === 'donations' ? (
                             <>
-                              <span className="text-ink-mute">·</span>
-                              <span>{src?.food_type}</span>
+                              <span className="text-ink-mute text-[10px]">·</span>
+                              <span className="text-xs">{src?.food_type}</span>
                               {src && <CountdownChip expiry={src.expiry_time} />}
                             </>
                           ) : (
                             <>
-                              <span className="text-ink-mute">·</span>
-                              <span className="rounded-md bg-blue-50 px-2 py-0.5 font-semibold text-blue-700">
-                                Need level {s.need_level}/5
+                              <span className="text-ink-mute text-[10px]">·</span>
+                              <span className="rounded bg-urgent-soft px-1.5 py-0.5 text-[10px] font-semibold text-urgent border border-urgent-border">
+                                Need {s.need_level}/5
                               </span>
                             </>
                           )}
@@ -606,15 +590,15 @@ export default function AdminControl() {
             </div>
           )}
 
-          {/* TAB 2: Matches (Pairings) */}
+          {/* TAB 2: Matches */}
           {activeTab === 'matches' && (
-            <div className="card p-4 space-y-3">
-              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                <div className="text-xs font-bold text-ink uppercase tracking-wide">
-                  Intelligent Allocations ({d.results?.matches_count || 0})
+            <div className="card p-3.5 space-y-3">
+              <div className="flex items-center justify-between pb-2 border-b border-line">
+                <div className="text-xs font-semibold text-ink uppercase tracking-wide">
+                  Pairings ({d.results?.matches_count || 0})
                 </div>
                 {matched && (
-                  <span className="text-xs font-semibold text-leaf-700 bg-leaf-50 px-2 py-0.5 rounded-full border border-leaf-200">
+                  <span className="text-xs font-semibold text-brand-700 bg-brand-50 px-2 py-0.5 rounded border border-brand-100">
                     Total: {fmtKg(d.results?.total_allocated_kg)}
                   </span>
                 )}
@@ -622,56 +606,55 @@ export default function AdminControl() {
 
               {!matched ? (
                 <EmptyState
-                  title="No matches generated yet"
-                  text="Click 'Run Urgency Matching' above to pair open surplus with recipient shelters in priority order."
+                  title="No matches generated"
+                  text="Run matching to compute urgency-first pairings."
                   icon={Zap}
                   action={
-                    <Button className="btn-primary text-xs" loading={busy === 'match'} onClick={runMatching}>
-                      Run Matching Now
+                    <Button className="btn-primary text-xs !py-1.5 !px-3" loading={busy === 'match'} onClick={runMatching}>
+                      Run Matching
                     </Button>
                   }
                 />
               ) : (
-                <div className="space-y-2.5 max-h-[500px] overflow-y-auto pr-1">
+                <div className="space-y-2 max-h-[460px] overflow-y-auto pr-1">
                   {d.results.matches.map((x) => (
                     <div
                       key={x.match_id}
-                      className="rounded-xl border border-slate-200 bg-white p-3.5 text-sm hover:border-slate-300 transition shadow-sm"
+                      className="rounded-lg border border-line bg-white p-3 text-xs hover:border-slate-300 transition-all"
                     >
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="rounded-md bg-leaf-100 px-2 py-0.5 text-xs font-bold text-leaf-800">
+                        <div className="flex items-center gap-1.5">
+                          <span className="rounded bg-brand-50 border border-brand-100 px-1.5 py-0.5 text-[11px] font-semibold text-brand-700">
                             {fmtKg(x.allocated_kg)}
                           </span>
-                          <span className="text-xs text-ink-soft">{x.food_type}</span>
+                          <span className="text-ink-soft">{x.food_type}</span>
                         </div>
-                        <span className="text-[11px] font-mono text-ink-mute font-semibold">
+                        <span className="text-[11px] font-mono text-ink-mute">
                           Priority {Number(x.priority_score).toFixed(2)}
                         </span>
                       </div>
-                      <div className="mt-2.5 flex items-center gap-2 text-xs text-ink">
-                        <span className="truncate font-semibold">{x.donor_name}</span>
-                        <ArrowRight className="h-3.5 w-3.5 shrink-0 text-leaf-600" />
-                        <span className="truncate font-semibold text-blue-700">{x.receiver_name}</span>
+                      <div className="mt-2 flex items-center gap-1.5 text-ink font-medium">
+                        <span className="truncate">{x.donor_name}</span>
+                        <ArrowRight className="h-3 w-3 shrink-0 text-brand-500" />
+                        <span className="truncate text-info font-semibold">{x.receiver_name}</span>
                       </div>
                     </div>
                   ))}
 
-                  {/* Honest Unmatched List if any */}
+                  {/* Unmatched surplus if any */}
                   {d.results?.unmatched?.length > 0 && (
-                    <div className="mt-4 pt-3 border-t border-slate-100">
-                      <div className="text-xs font-bold text-amber-800 mb-2 flex items-center gap-1.5">
-                        <Split className="h-3.5 w-3.5" />
-                        <span>Honest Surplus Leftover ({d.results.unmatched.length})</span>
+                    <div className="mt-3 pt-2.5 border-t border-line">
+                      <div className="text-xs font-semibold text-warning mb-1.5 flex items-center gap-1">
+                        <Split className="h-3 w-3" />
+                        <span>Unmatched Leftover ({d.results.unmatched.length})</span>
                       </div>
-                      <div className="space-y-2">
+                      <div className="space-y-1.5">
                         {d.results.unmatched.map((u, i) => (
-                          <div key={i} className="rounded-xl border border-amber-200 bg-amber-50/50 p-2.5 text-xs">
-                            <div className="font-bold text-ink">{u.item_name}</div>
-                            <div className="text-ink-soft">
-                              {u.item_type} · {fmtKg(u.unallocated_kg)}
+                          <div key={i} className="rounded border border-warning-border bg-warning-soft/40 p-2 text-xs">
+                            <div className="font-semibold text-ink">{u.item_name}</div>
+                            <div className="text-ink-soft text-[11px]">
+                              {u.item_type} · {fmtKg(u.unallocated_kg)} ({u.reason})
                             </div>
-                            <div className="mt-1 text-amber-700 font-medium">{u.reason}</div>
                           </div>
                         ))}
                       </div>
@@ -682,19 +665,19 @@ export default function AdminControl() {
             </div>
           )}
 
-          {/* TAB 3: Fleet (Routes & Vehicles) */}
+          {/* TAB 3: Fleet */}
           {activeTab === 'fleet' && (
-            <div className="card p-4 space-y-3">
-              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                <div className="text-xs font-bold text-ink uppercase tracking-wide">
-                  Dispatched Routes ({routes.length})
+            <div className="card p-3.5 space-y-3">
+              <div className="flex items-center justify-between pb-2 border-b border-line">
+                <div className="text-xs font-semibold text-ink uppercase tracking-wide">
+                  Vehicles ({routes.length})
                 </div>
                 {routes.length > 0 && (
                   <Link
                     to="/admin/routes"
-                    className="text-xs font-bold text-leaf-700 hover:text-leaf-800 flex items-center gap-1"
+                    className="text-xs font-medium text-brand-600 hover:text-brand-700 flex items-center gap-1"
                   >
-                    <span>Full Driver Itineraries</span>
+                    <span>Driver Timelines</span>
                     <ExternalLink className="h-3 w-3" />
                   </Link>
                 )}
@@ -702,32 +685,28 @@ export default function AdminControl() {
 
               {!routes.length ? (
                 <EmptyState
-                  title="No vehicle routes planned"
-                  text={
-                    matched
-                      ? "Matches are ready! Click 'Plan Fleet Routes' above to dispatch the multi-depot fleet."
-                      : 'Run matching first before planning vehicle routes.'
-                  }
+                  title="No fleet routes planned"
+                  text={matched ? 'Matches ready! Plan routes to dispatch multi-depot fleet.' : 'Run matching first.'}
                   icon={Truck}
                   action={
                     matched && (
-                      <Button className="btn-primary text-xs" loading={busy === 'plan'} onClick={planRoutes}>
+                      <Button className="btn-primary text-xs !py-1.5 !px-3" loading={busy === 'plan'} onClick={planRoutes}>
                         Plan Fleet Routes
                       </Button>
                     )
                   }
                 />
               ) : (
-                <div className="space-y-2.5 max-h-[500px] overflow-y-auto pr-1">
+                <div className="space-y-2 max-h-[460px] overflow-y-auto pr-1">
                   {m && (
-                    <div className="grid grid-cols-2 gap-2 text-xs mb-3">
-                      <div className="rounded-xl bg-slate-50 border border-slate-200/80 p-2.5">
-                        <div className="text-ink-mute">Total Distance</div>
-                        <div className="font-display text-base font-bold text-ink">{m.total_distance_km} km</div>
+                    <div className="grid grid-cols-2 gap-2 text-xs mb-2">
+                      <div className="rounded border border-line bg-slate-50 p-2">
+                        <div className="text-ink-mute text-[10px] uppercase font-medium">Distance</div>
+                        <div className="text-sm font-bold text-ink">{m.total_distance_km} km</div>
                       </div>
-                      <div className="rounded-xl bg-slate-50 border border-slate-200/80 p-2.5">
-                        <div className="text-ink-mute">Food Delivered</div>
-                        <div className="font-display text-base font-bold text-leaf-800">
+                      <div className="rounded border border-line bg-slate-50 p-2">
+                        <div className="text-ink-mute text-[10px] uppercase font-medium">Delivered</div>
+                        <div className="text-sm font-bold text-brand-600">
                           {m.delivery_rate_percent}% ({fmtKg(m.food_delivered_kg)})
                         </div>
                       </div>
@@ -741,24 +720,23 @@ export default function AdminControl() {
                       onMouseEnter={() => setFocus(r.vehicle_id)}
                       onMouseLeave={() => setFocus(null)}
                       onClick={() => setFocus(focus === r.vehicle_id ? null : r.vehicle_id)}
-                      className={`flex w-full items-center gap-3 rounded-xl border p-3 text-left transition-all ${
-                        focus === r.vehicle_id
-                          ? 'border-leaf-600 bg-leaf-50/70 shadow-sm'
-                          : 'border-slate-200 bg-white hover:border-slate-300'
-                      }`}
+                      className={`flex w-full items-center gap-2.5 rounded-lg border p-2.5 text-left transition-all ${focus === r.vehicle_id
+                          ? 'border-brand-500 bg-brand-50/50 shadow-sm'
+                          : 'border-line bg-white hover:border-slate-300'
+                        }`}
                     >
                       <span
-                        className="grid h-9 w-9 place-items-center rounded-xl text-xs font-bold text-white shadow-sm"
+                        className="grid h-7 w-7 place-items-center rounded text-xs font-bold text-white shadow-sm"
                         style={{ background: colorForVehicle(r.vehicle_id) }}
                       >
                         V{r.vehicle_id}
                       </span>
                       <div className="flex-1 min-w-0">
-                        <div className="font-bold text-ink text-sm flex items-center justify-between">
+                        <div className="font-semibold text-ink text-xs flex items-center justify-between">
                           <span>{r.depot_name}</span>
-                          <span className="text-xs text-ink-mute font-normal">{r.capacity_utilization_percent}% peak</span>
+                          <span className="text-[11px] text-ink-mute font-normal">{r.capacity_utilization_percent}% load</span>
                         </div>
-                        <div className="mt-0.5 text-xs text-ink-soft">
+                        <div className="mt-0.5 text-[11px] text-ink-soft">
                           {r.stops.length} stops · {r.total_distance_km} km · Cap {r.capacity_kg} kg
                         </div>
                       </div>
@@ -770,15 +748,15 @@ export default function AdminControl() {
           )}
         </div>
 
-        {/* Right Column: Generous Map View Stage & Inspection Drawer */}
-        <div className="lg:col-span-7 space-y-3">
+        {/* Right Column: Geographic Map View */}
+        <div className="lg:col-span-7 space-y-2.5">
           <div className="card overflow-hidden shadow-card p-1 bg-white">
-            <div className="flex items-center justify-between px-3 py-2 border-b border-slate-100 text-xs">
-              <span className="font-bold text-ink flex items-center gap-1.5">
-                <MapPin className="h-4 w-4 text-leaf-700" />
+            <div className="flex items-center justify-between px-3 py-2 border-b border-line text-xs">
+              <span className="font-semibold text-ink flex items-center gap-1.5">
+                <MapPin className="h-3.5 w-3.5 text-brand-600" />
                 <span>Geographic Overview (Bangalore Operations)</span>
               </span>
-              <span className="text-ink-mute">Click any pin or vehicle line to inspect</span>
+              <span className="text-ink-mute text-[11px]">Click marker to inspect</span>
             </div>
 
             <MapView
@@ -788,33 +766,31 @@ export default function AdminControl() {
               routes={routes}
               scores={scoreMap}
               focusVehicle={focus}
-              height={560}
+              height={520}
               onSelect={onSelect}
             />
           </div>
 
-          {/* Interactive Inspection Drawer when pin is clicked */}
+          {/* Interactive Inspection Drawer when marker is clicked */}
           {sel ? (
-            <div className="card p-4 border-leaf-300 bg-leaf-50/50 shadow-sm animate-in fade-in duration-150">
-              <div className="flex items-start justify-between gap-4">
+            <div className="card p-3.5 border-brand-200 bg-brand-50/40 shadow-sm animate-in fade-in duration-150">
+              <div className="flex items-start justify-between gap-3">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold uppercase tracking-wider text-leaf-800 bg-leaf-200/80 px-2 py-0.5 rounded-md">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-brand-800 bg-brand-100 px-1.5 py-0.5 rounded">
                       {sel.kind}
                     </span>
-                    <h3 className="font-display text-base font-bold text-ink">
+                    <h3 className="text-xs sm:text-sm font-bold text-ink">
                       {sel.item.donor_name || sel.item.receiver_name || sel.item.name}
                     </h3>
                   </div>
 
-                  <p className="mt-1 text-xs sm:text-sm text-ink-soft leading-relaxed">
+                  <p className="mt-1 text-xs text-ink-soft leading-relaxed">
                     {sel.kind === 'donation' &&
-                      `${sel.item.food_type} · ${fmtKg(sel.item.remaining_kg)} remaining · Handover window: ${
-                        sel.item.pickup_window.start
+                      `${sel.item.food_type} · ${fmtKg(sel.item.remaining_kg)} remaining · Pickup: ${sel.item.pickup_window.start
                       }–${sel.item.pickup_window.end}`}
                     {sel.kind === 'request' &&
-                      `Needs ${fmtKg(sel.item.remaining_kg)} · Hunger Level ${sel.item.need_level}/5 · Receiving window: ${
-                        sel.item.delivery_window.start
+                      `Needs ${fmtKg(sel.item.remaining_kg)} · Level ${sel.item.need_level}/5 · Window: ${sel.item.delivery_window.start
                       }–${sel.item.delivery_window.end}`}
                     {sel.kind === 'depot' && `Distribution Hub · Coordinates: ${sel.item.location.lat}, ${sel.item.location.lng}`}
                   </p>
@@ -826,16 +802,16 @@ export default function AdminControl() {
                     className="btn-ghost !p-1 text-ink-mute hover:text-ink text-xs"
                     onClick={() => setSel(null)}
                   >
-                    Dismiss
+                    Close
                   </button>
                 </div>
               </div>
             </div>
           ) : (
-            <div className="flex items-center justify-between px-3 text-xs text-ink-mute">
-              <span>💡 Tip: Click any marker on the map to view batch specifications and time windows.</span>
-              <Link to="/how-it-works" className="hover:text-leaf-800 font-semibold underline">
-                Urgency Formula
+            <div className="flex items-center justify-between px-2 text-xs text-ink-mute">
+              <span>Click any marker to inspect batch specifications and time windows.</span>
+              <Link to="/how-it-works" className="hover:text-brand-600 font-medium">
+                Algorithm Details
               </Link>
             </div>
           )}
@@ -846,35 +822,34 @@ export default function AdminControl() {
       <Modal
         open={replanOpen}
         onClose={() => setReplanOpen(false)}
-        title="Simulate Real-World Disruption"
+        title="Simulate Fleet Disruption"
         footer={
           <>
-            <button className="btn-secondary" onClick={() => setReplanOpen(false)}>
+            <button className="btn-secondary !py-1.5 !px-3 text-xs" onClick={() => setReplanOpen(false)}>
               Cancel
             </button>
-            <Button className="btn-primary" onClick={replan}>
-              Re-optimize Fleet
+            <Button className="btn-primary !py-1.5 !px-3.5 text-xs" onClick={replan}>
+              Update Routes
             </Button>
           </>
         }
       >
-        <p className="mb-4 text-ink-soft leading-relaxed">
-          Test SmartFeed's resilience by temporarily taking delivery vehicles offline or injecting unexpected urgent surplus donations. The optimizer will instantly re-route remaining active fleet.
+        <p className="mb-3 text-xs sm:text-sm text-ink-soft leading-relaxed">
+          Test resilience by simulating a vehicle breakdown or injecting an emergency surplus batch. The engine will dynamically re-route active vehicles.
         </p>
 
-        <fieldset className="mb-4">
-          <legend className="label mb-2">Simulate Vehicle Breakdown</legend>
+        <fieldset className="mb-3">
+          <legend className="label mb-1.5">Simulate Breakdown</legend>
           <div className="grid grid-cols-2 gap-2">
             {d.vehicles.map((v) => {
               const isOffline = offline.includes(v.id)
               return (
                 <label
                   key={v.id}
-                  className={`cursor-pointer rounded-xl border p-2.5 text-xs font-semibold transition ${
-                    isOffline
-                      ? 'border-rose-400 bg-rose-50 text-rose-800 ring-1 ring-rose-300'
-                      : 'border-slate-200 bg-white hover:bg-slate-50 text-ink'
-                  }`}
+                  className={`cursor-pointer rounded-lg border p-2 text-xs transition-all ${isOffline
+                      ? 'border-urgent-border bg-urgent-soft text-urgent font-medium'
+                      : 'border-line bg-white hover:bg-slate-50 text-ink'
+                    }`}
                 >
                   <input
                     type="checkbox"
@@ -885,11 +860,11 @@ export default function AdminControl() {
                     }
                   />
                   <div className="flex items-center justify-between">
-                    <span>Vehicle {v.id}</span>
-                    <span className="text-[11px] font-normal text-ink-soft">{v.capacity_kg} kg</span>
+                    <span className="font-semibold">Vehicle {v.id}</span>
+                    <span className="text-[11px] text-ink-mute">{v.capacity_kg} kg</span>
                   </div>
-                  <div className="text-[10px] text-ink-mute mt-0.5">
-                    {isOffline ? '⚠️ Disabled (in breakdown)' : 'Active'}
+                  <div className="text-[10px] mt-0.5">
+                    {isOffline ? 'Disabled (breakdown)' : 'Active'}
                   </div>
                 </label>
               )
@@ -897,17 +872,17 @@ export default function AdminControl() {
           </div>
         </fieldset>
 
-        <label className="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs font-medium text-ink cursor-pointer">
+        <label className="flex items-start gap-2.5 rounded-lg border border-line bg-slate-50 p-2.5 text-xs text-ink cursor-pointer">
           <input
             type="checkbox"
             checked={urgentDrop}
             onChange={(e) => setUrgentDrop(e.target.checked)}
-            className="mt-0.5 rounded accent-leaf-700"
+            className="mt-0.5 rounded accent-brand-500"
           />
           <div>
-            <span className="font-bold block">Inject Urgent 60 kg Cooked Meal Surplus</span>
+            <span className="font-semibold block">Inject Emergency 60 kg Cooked Meal Surplus</span>
             <span className="text-ink-mute text-[11px]">
-              Simulates a banquet hall calling with hot food expiring in 2.5 hours.
+              Simulates hot banquet food expiring in 2.5 hours needing priority pickup.
             </span>
           </div>
         </label>

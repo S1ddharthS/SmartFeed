@@ -13,50 +13,50 @@ export default function RouteTimeline({ route, compact = false }) {
   const color = colorForVehicle(route.vehicle_id)
 
   return (
-    <div className="card p-5 border-slate-200/90 shadow-sm transition hover:shadow-card-hover">
+    <div className="card p-5 border-line shadow-card hover:border-slate-300 transition-all">
       {/* Vehicle Summary Header */}
-      <div className="mb-5 pb-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
+      <div className="mb-4 pb-3.5 border-b border-line flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5">
           <div
-            className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-sm font-bold text-white shadow-sm ring-2 ring-white"
+            className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-xs font-bold text-white shadow-sm"
             style={{ background: color }}
           >
             V{route.vehicle_id}
           </div>
           <div>
-            <div className="font-display text-base font-bold text-ink">
-              Vehicle {route.vehicle_id} · <span className="font-normal text-ink-soft">{route.depot_name}</span>
+            <div className="text-sm font-semibold text-ink leading-tight">
+              Vehicle {route.vehicle_id} · <span className="text-xs text-ink-soft font-normal">{route.depot_name}</span>
             </div>
-            <div className="text-xs text-ink-mute">
-              Max Payload: <b className="text-ink-soft">{route.capacity_kg} kg</b> · Shift Active
+            <div className="text-[11px] text-ink-mute mt-0.5">
+              Max Payload: {route.capacity_kg} kg · Shift Active
             </div>
           </div>
         </div>
 
         {/* Quick Vehicle KPIs */}
-        <div className="flex items-center gap-2 sm:gap-4 text-xs">
-          <div className="rounded-lg bg-slate-50 px-2.5 py-1 text-center border border-slate-200/60">
-            <span className="text-ink-mute block text-[10px] uppercase font-semibold">Distance</span>
-            <span className="font-bold text-ink">{route.total_distance_km} km</span>
+        <div className="flex items-center gap-2 text-xs">
+          <div className="rounded border border-line bg-slate-50 px-2 py-1 text-center">
+            <span className="text-ink-mute block text-[9px] uppercase font-medium">Distance</span>
+            <span className="font-semibold text-ink text-xs">{route.total_distance_km} km</span>
           </div>
-          <div className="rounded-lg bg-slate-50 px-2.5 py-1 text-center border border-slate-200/60">
-            <span className="text-ink-mute block text-[10px] uppercase font-semibold">Duration</span>
-            <span className="font-bold text-ink">{Math.round(route.total_time_min)} min</span>
+          <div className="rounded border border-line bg-slate-50 px-2 py-1 text-center">
+            <span className="text-ink-mute block text-[9px] uppercase font-medium">Duration</span>
+            <span className="font-semibold text-ink text-xs">{Math.round(route.total_time_min)}m</span>
           </div>
-          <div className="rounded-lg bg-slate-50 px-2.5 py-1 text-center border border-slate-200/60">
-            <span className="text-ink-mute block text-[10px] uppercase font-semibold">Peak Load</span>
-            <span className="font-bold text-leaf-800">{route.capacity_utilization_percent}%</span>
+          <div className="rounded border border-line bg-slate-50 px-2 py-1 text-center">
+            <span className="text-ink-mute block text-[9px] uppercase font-medium">Load</span>
+            <span className="font-semibold text-brand-600 text-xs">{route.capacity_utilization_percent}%</span>
           </div>
         </div>
       </div>
 
       {/* Capacity Utilization Progress Bar */}
-      <div className="mb-5">
+      <div className="mb-4">
         <div className="flex items-center justify-between text-xs mb-1">
-          <span className="text-ink-mute font-medium">Capacity Utilization</span>
-          <span className="font-bold text-ink">{route.max_load_kg || 0} / {route.capacity_kg} kg</span>
+          <span className="text-ink-mute text-[11px]">Payload Load</span>
+          <span className="font-medium text-ink text-xs">{route.max_load_kg || 0} / {route.capacity_kg} kg</span>
         </div>
-        <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
+        <div className="h-1.5 w-full rounded-full bg-slate-100 overflow-hidden">
           <div
             className="h-full rounded-full transition-all duration-500"
             style={{
@@ -68,7 +68,7 @@ export default function RouteTimeline({ route, compact = false }) {
       </div>
 
       {/* Vertical Stop-by-Stop Itinerary */}
-      <ol className="relative ml-4 border-l-2 pl-6 space-y-4" style={{ borderColor: `${color}40` }}>
+      <ol className="relative ml-3.5 border-l-2 pl-5 space-y-3.5" style={{ borderColor: `${color}30` }}>
         {steps.map((s, i) => {
           const isDepot = s.type.startsWith('depot')
           const isPickup = s.type === 'pickup'
@@ -80,33 +80,34 @@ export default function RouteTimeline({ route, compact = false }) {
           const title = isDepot
             ? s.type === 'depot_start'
               ? `Depart from ${s.name}`
-              : `Return & Park at ${s.name}`
+              : `Return to ${s.name}`
             : isPickup
-              ? `Pick up surplus from ${s.donor_name}`
-              : `Deliver food to ${s.receiver_name}`
+              ? `Pick up from ${s.donor_name}`
+              : `Deliver to ${s.receiver_name}`
 
           return (
             <li key={i} className="relative group">
               {/* Node Icon on Timeline */}
               <span
-                className="absolute -left-[2.15rem] grid h-7 w-7 place-items-center rounded-full border-2 bg-white shadow-sm transition group-hover:scale-110"
+                className="absolute -left-[1.85rem] grid h-6 w-6 place-items-center rounded-full border bg-white shadow-sm transition group-hover:scale-110"
                 style={{ borderColor: color }}
               >
-                <Icon className="h-3.5 w-3.5" style={{ color }} />
+                <Icon className="h-3 w-3" style={{ color }} />
               </span>
 
               {/* Stop Card */}
               <div
-                className={`rounded-xl border p-3 text-xs sm:text-sm transition ${isDepot
-                    ? 'border-slate-200 bg-slate-50/60'
+                className={`rounded-lg border p-2.5 text-xs transition-all ${
+                  isDepot
+                    ? 'border-line bg-slate-50/60'
                     : isPickup
-                      ? 'border-emerald-200 bg-emerald-50/30'
-                      : 'border-blue-200 bg-blue-50/30'
-                  }`}
+                    ? 'border-brand-100 bg-brand-50/20'
+                    : 'border-info-border bg-info-soft/20'
+                }`}
               >
                 <div className="flex flex-wrap items-center justify-between gap-1">
-                  <span className="font-bold text-ink">{title}</span>
-                  <span className="text-xs font-semibold text-ink-soft bg-white/80 px-2 py-0.5 rounded-md border border-slate-200/50">
+                  <span className="font-semibold text-ink text-xs">{title}</span>
+                  <span className="text-[11px] text-ink-soft bg-white px-1.5 py-0.5 rounded border border-line">
                     {s.arrive ? `Arrive ${s.arrive}` : ''}
                     {s.arrive && s.depart ? ' · ' : ''}
                     {s.depart ? `Depart ${s.depart}` : ''}
@@ -114,34 +115,35 @@ export default function RouteTimeline({ route, compact = false }) {
                 </div>
 
                 {!isDepot && (
-                  <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
+                  <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[11px]">
                     <span
-                      className={`font-bold px-2 py-0.5 rounded-md ${isPickup ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'
-                        }`}
+                      className={`font-semibold px-1.5 py-0.5 rounded ${
+                        isPickup ? 'bg-brand-50 text-brand-700 border border-brand-100' : 'bg-info-soft text-info border border-info-border'
+                      }`}
                     >
-                      {isPickup ? `+${s.kg} kg collected` : `-${s.kg} kg dropped`}
+                      {isPickup ? `+${s.kg} kg` : `-${s.kg} kg`}
                     </span>
-                    <span className="text-ink-soft">On-board: {s.cum_load_kg} kg</span>
+                    <span className="text-ink-mute">On-board: {s.cum_load_kg} kg</span>
 
                     {String(s.task_id || '').includes('_') && (
-                      <span className="inline-flex items-center gap-1 rounded-md bg-amber-100 px-1.5 py-0.5 font-bold text-amber-800 text-[11px]">
-                        <Split className="h-3 w-3" /> Split Lot
+                      <span className="inline-flex items-center gap-1 rounded bg-warning-soft px-1.5 py-0.5 font-medium text-warning text-[10px] border border-warning-border">
+                        <Split className="h-2.5 w-2.5" /> Split Lot
                       </span>
                     )}
 
                     {isDelivery && mins != null && !warn && (
-                      <span className="inline-flex items-center gap-1 text-[11px] text-emerald-700 font-semibold ml-auto">
-                        <CheckCircle2 className="h-3 w-3" /> Delivered {mins}m before expiry
+                      <span className="inline-flex items-center gap-1 text-[10px] text-brand-600 font-medium ml-auto">
+                        <CheckCircle2 className="h-3 w-3" /> {mins}m safe margin
                       </span>
                     )}
                   </div>
                 )}
 
                 {warn && !compact && (
-                  <div className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-rose-100/80 px-2.5 py-1 text-xs font-bold text-rose-800">
-                    <AlertTriangle className="h-3.5 w-3.5" />
+                  <div className="mt-1.5 inline-flex items-center gap-1.5 rounded bg-urgent-soft px-2 py-0.5 text-[11px] font-medium text-urgent border border-urgent-border">
+                    <AlertTriangle className="h-3 w-3 shrink-0" />
                     <span>
-                      {mins <= 0 ? '⚠️ Arrives after expiration time' : `⚠️ Tight window: Only ${mins} min until food expires`}
+                      {mins <= 0 ? 'Arrives after expiry' : `Tight window: ${mins}m left before expiry`}
                     </span>
                   </div>
                 )}

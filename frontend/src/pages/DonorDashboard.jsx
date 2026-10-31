@@ -1,6 +1,18 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, CheckCircle2, Clock, MapPin, Package, Plus, Scale, Soup, Sparkles, Trash2, Utensils } from 'lucide-react'
+import {
+  ArrowRight,
+  CheckCircle2,
+  Clock,
+  MapPin,
+  Package,
+  Plus,
+  Scale,
+  Soup,
+  Sparkles,
+  Trash2,
+  Utensils,
+} from 'lucide-react'
 import { api } from '../api/client'
 import { isMine, useApp } from '../context/AppContext'
 import { useAsync } from '../lib/useAsync'
@@ -36,18 +48,18 @@ export default function DonorDashboard() {
     }
   }, [user?.username, demoMin])
 
-  if (loading) return <PageLoader label="Loading your food donations…" />
+  if (loading) return <PageLoader label="Loading donation records…" />
   if (error) return <ErrorState message={error} onRetry={reload} />
 
   const { donations, scores, matches } = data
-  const total = donations.reduce((s, d) => s + d.quantity_kg, 0)
-  const placed = donations.reduce((s, d) => s + (d.quantity_kg - d.remaining_kg), 0)
+  const totalKg = donations.reduce((s, d) => s + d.quantity_kg, 0)
+  const placedKg = donations.reduce((s, d) => s + (d.quantity_kg - (d.remaining_kg ?? 0)), 0)
 
   const remove = async () => {
     setBusy(true)
     try {
       await api.deleteDonation(del.id)
-      toast('Donation listing removed successfully')
+      toast('Donation listing deleted')
       setDel(null)
       reload()
     } catch (e) {
@@ -58,95 +70,95 @@ export default function DonorDashboard() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       <PageHeader
-        title="My Food Donations"
-        subtitle={`Welcome, ${user.username}. Track surplus pickups and see which shelters received your food.`}
+        title="Donor Dashboard"
+        subtitle={`Track surplus batches, pickup schedules, and matched shelters for ${user.username}.`}
         badge={
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-leaf-100 px-3 py-1 text-xs font-bold text-leaf-800 border border-leaf-200">
-            <Sparkles className="h-3.5 w-3.5 text-leaf-700" /> Food Donor Portal
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 border border-brand-100 px-2.5 py-0.5 text-xs font-semibold text-brand-700">
+            <Sparkles className="h-3 w-3 text-brand-500" /> Donor Portal
           </span>
         }
         actions={
-          <Link to="/donor/donate" className="btn-primary !px-4 !py-2.5 shadow-sm hover:shadow">
+          <Link to="/donor/donate" className="btn-primary !px-4 !py-2 text-xs sm:text-sm">
             <Plus className="h-4 w-4" />
-            <span>Donate Surplus Food</span>
+            <span>Donate Food</span>
           </Link>
         }
       />
 
-      {/* Donor Impact Stats */}
+      {/* 3 Simple Overview Metrics */}
       <div className="grid gap-3 sm:gap-4 sm:grid-cols-3">
         <StatCard
           icon={Scale}
-          label="Total Surplus Offered"
-          value={fmtKg(total)}
-          hint="Total volume registered"
+          label="Total Food Donated"
+          value={fmtKg(totalKg)}
+          hint={`${donations.length} total surplus listings`}
           tone="leaf"
         />
         <StatCard
           icon={Soup}
           label="Matched to Shelters"
-          value={fmtKg(placed)}
-          hint={total > 0 ? `${Math.round((placed / total) * 100)}% allocation rate` : 'Awaiting surplus'}
+          value={fmtKg(placedKg)}
+          hint={totalKg > 0 ? `${Math.round((placedKg / totalKg) * 100)}% delivered to shelters` : 'No active listings'}
           tone="blue"
         />
         <StatCard
           icon={Utensils}
-          label="Meals Made Possible"
-          value={mealsFromKg(placed).toLocaleString()}
+          label="Estimated Meals"
+          value={mealsFromKg(placedKg).toLocaleString()}
           hint="Calculated at ~400g per meal"
           tone="amber"
         />
       </div>
 
-      {/* Donation Cards */}
+      {/* Active Donations */}
       {!donations.length ? (
         <EmptyState
-          title="No active food donations yet"
-          text="Post your first batch of surplus meals, bakery items, or produce. Registration takes under 60 seconds."
+          title="No donations yet"
+          text="List your surplus food to automatically match with local shelters in need."
           icon={Package}
           action={
             <Link to="/donor/donate" className="btn-primary">
               <Plus className="h-4 w-4" />
-              <span>Post Surplus Batch</span>
+              <span>Donate Food</span>
             </Link>
           }
         />
       ) : (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between text-xs font-bold text-ink-mute uppercase tracking-wider">
-            <span>Your Listed Batches ({donations.length})</span>
-            <span>Real-time dispatch status</span>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between text-xs font-medium text-ink-soft">
+            <span>Your Donations ({donations.length})</span>
+            <span>Live status</span>
           </div>
 
-          <div className="grid gap-5 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-2">
             {donations.map((d) => {
-              const my = matches.filter((m) => m.donation_id === d.id)
+              const myMatches = matches.filter((m) => m.donation_id === d.id)
               const score = scores[d.id]
 
               return (
                 <article
                   key={d.id}
-                  className="card p-5 border-slate-200/90 shadow-sm transition hover:shadow-card-hover flex flex-col justify-between"
+                  className="card p-5 hover:border-slate-300 hover:shadow-card-hover transition-all flex flex-col justify-between"
                 >
                   <div className="space-y-3">
-                    {/* Header: Food Type & Status */}
-                    <div className="flex flex-wrap items-start justify-between gap-2 border-b border-slate-100 pb-3">
+                    {/* Header */}
+                    <div className="flex items-start justify-between gap-2 border-b border-line pb-3">
                       <div>
-                        <h2 className="font-display text-lg font-bold text-ink">{d.food_type}</h2>
+                        <h2 className="text-base font-semibold text-ink leading-snug">{d.food_type}</h2>
                         <span className="text-xs text-ink-soft">{d.donor_name}</span>
                       </div>
                       <StatusPill status={d.status} />
                     </div>
 
-                    {/* Quantity & Expiry Badges */}
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-bold text-ink">
-                        {fmtKg(d.quantity_kg)} total
+                    {/* Volume & Urgency Badges */}
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span className="rounded bg-slate-100 px-2 py-0.5 text-xs font-semibold text-ink">
+                        {fmtKg(d.quantity_kg)}
                       </span>
                       {d.remaining_kg < d.quantity_kg && (
-                        <span className="rounded-lg bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-xs font-semibold text-emerald-800">
+                        <span className="rounded bg-brand-50 border border-brand-100 px-2 py-0.5 text-xs font-medium text-brand-700">
                           {fmtKg(d.quantity_kg - d.remaining_kg)} matched
                         </span>
                       )}
@@ -155,30 +167,30 @@ export default function DonorDashboard() {
                     </div>
 
                     {/* Timing details */}
-                    <div className="rounded-xl bg-slate-50 border border-slate-200/60 p-3 text-xs space-y-1">
+                    <div className="rounded-lg bg-slate-50 border border-line p-2.5 text-xs">
                       <div className="flex items-center justify-between text-ink-soft">
                         <span className="flex items-center gap-1.5">
                           <Clock className="h-3.5 w-3.5 text-ink-mute" />
                           <span>Pickup Window:</span>
                         </span>
-                        <b className="text-ink">
+                        <span className="font-semibold text-ink">
                           {d.pickup_window.start} – {d.pickup_window.end}
-                        </b>
+                        </span>
                       </div>
                     </div>
 
-                    {/* Matched Recipients (Shelters) */}
-                    {my.length > 0 && (
-                      <div className="rounded-xl border border-emerald-200 bg-emerald-50/50 p-3.5 text-xs">
-                        <div className="font-bold text-emerald-950 mb-1.5 flex items-center gap-1.5">
-                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
-                          <span>Recipient Allocations:</span>
+                    {/* Matched Shelters */}
+                    {myMatches.length > 0 && (
+                      <div className="rounded-lg border border-brand-100 bg-brand-50/50 p-3 text-xs">
+                        <div className="font-semibold text-brand-800 mb-1 flex items-center gap-1.5">
+                          <CheckCircle2 className="h-3.5 w-3.5 text-brand-600" />
+                          <span>Matched Shelters:</span>
                         </div>
                         <ul className="space-y-1">
-                          {my.map((m) => (
-                            <li key={m.match_id} className="flex items-center justify-between font-medium text-ink">
+                          {myMatches.map((m) => (
+                            <li key={m.match_id} className="flex items-center justify-between text-ink">
                               <span>{m.receiver_name}</span>
-                              <b className="text-emerald-800">{fmtKg(m.allocated_kg)}</b>
+                              <span className="font-semibold text-brand-700">{fmtKg(m.allocated_kg)}</span>
                             </li>
                           ))}
                         </ul>
@@ -187,14 +199,15 @@ export default function DonorDashboard() {
                   </div>
 
                   {/* Actions footer */}
-                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-                    <span className="text-ink-mute">Batch #{d.id}</span>
+                  <div className="mt-4 pt-3 border-t border-line flex items-center justify-between text-xs">
+                    <span className="text-ink-mute text-[11px]">ID #{d.id}</span>
                     <button
                       className="btn-danger !py-1 !px-2.5 text-xs"
                       onClick={() => setDel(d)}
+                      title="Delete this donation"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
-                      <span>Remove</span>
+                      <span>Delete</span>
                     </button>
                   </div>
                 </article>
@@ -206,9 +219,10 @@ export default function DonorDashboard() {
 
       {/* Confirmation Dialog */}
       <ConfirmDialog
-        open={!!del}
-        title="Remove this donation listing?"
-        message={`“${del?.food_type}” (${del?.quantity_kg} kg) from ${del?.donor_name} will be removed from the active rescue queue.`}
+        open={Boolean(del)}
+        title="Delete Donation"
+        message={`Are you sure you want to delete “${del?.food_type}” (${del?.quantity_kg} kg)? This action cannot be undone.`}
+        confirmLabel="Delete"
         onConfirm={remove}
         onCancel={() => setDel(null)}
         loading={busy}

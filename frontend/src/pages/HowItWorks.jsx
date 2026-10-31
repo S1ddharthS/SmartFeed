@@ -1,23 +1,23 @@
 import { ArrowRight, Boxes, Building2, CheckCircle2, Clock, Hourglass, Layers, Scale, ShieldCheck, Sparkles, Split, Zap } from 'lucide-react'
-import { PageHeader, UrgencySandbox } from '../components/ui'
+import { PageHeader } from '../components/ui'
 
 const Formula = ({ title, desc, rows }) => (
-  <div className="card p-6 border-slate-200/90 shadow-sm flex flex-col justify-between">
+  <div className="card p-5 border-line shadow-card flex flex-col justify-between">
     <div>
       <div className="flex items-center gap-2">
-        <Sparkles className="h-4 w-4 text-leaf-700" />
-        <h3 className="font-display text-base font-bold text-ink">{title}</h3>
+        <Sparkles className="h-4 w-4 text-brand-600" />
+        <h3 className="text-sm sm:text-base font-semibold text-ink">{title}</h3>
       </div>
       <p className="mt-1 text-xs text-ink-soft leading-relaxed">{desc}</p>
 
-      <ul className="mt-4 space-y-2.5 text-xs">
+      <ul className="mt-3.5 space-y-2 text-xs">
         {rows.map(([w, t, d]) => (
-          <li key={t} className="flex items-start gap-3 rounded-xl border border-slate-100 bg-slate-50/70 p-3">
-            <span className="w-12 shrink-0 rounded-lg bg-emerald-100 py-1 text-center font-mono font-bold text-emerald-900 text-xs">
+          <li key={t} className="flex items-start gap-2.5 rounded-lg border border-line bg-slate-50/70 p-2.5">
+            <span className="w-10 shrink-0 rounded bg-brand-50 border border-brand-100 py-0.5 text-center font-mono font-bold text-brand-700 text-xs">
               {w}
             </span>
             <div className="flex-1">
-              <b className="font-bold text-ink block">{t}</b>
+              <span className="font-semibold text-ink block">{t}</span>
               <span className="text-ink-soft leading-snug">{d}</span>
             </div>
           </li>
@@ -29,32 +29,32 @@ const Formula = ({ title, desc, rows }) => (
 
 export default function HowItWorks() {
   const rules = [
-    [Building2, 'Multi-Depot Fleet', 'Vehicles depart and return to their designated hub across Bangalore, avoiding wasted deadhead kilometers.'],
+    [Building2, 'Multi-Depot Fleet', 'Vehicles depart and return to their designated hub across Bangalore, avoiding wasted empty kilometers.'],
     [Boxes, 'Strict Payload Bounds', 'Vehicle capacity limits are strictly enforced at every pickup stop along the route.'],
-    [Split, 'Split Lot Deliveries', 'One large banquet donation can supply multiple shelters, and vice-versa, avoiding all-or-nothing bottlenecks.'],
-    [Clock, 'Operating Windows', 'Deliveries only arrive during staffed operating hours. Early arrivals wait safely.'],
-    [Hourglass, 'Zero-Waste Expiry Check', 'Any route plan that delivers food even 1 minute past its shelf-life is rejected outright.'],
-    [ShieldCheck, 'Sub-Second Optimization', 'Greedy insertion + 2-opt local search optimization finishes routing in under 1 second.'],
+    [Split, 'Split Lot Deliveries', 'One large banquet surplus batch can supply multiple shelters, eliminating all-or-nothing bottlenecks.'],
+    [Clock, 'Operating Windows', 'Deliveries only arrive during staffed volunteer hours. Early arrivals wait safely outside.'],
+    [Hourglass, 'Zero-Waste Expiry Check', 'Any route plan that risks arriving past food safety shelf-life is rejected outright.'],
+    [ShieldCheck, 'Sub-Second Optimization', 'Heuristic insertion + 2-opt local search optimization solves full fleet routes in under 1 second.'],
   ]
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto">
+    <div className="space-y-8 max-w-5xl mx-auto animate-fade-in">
       <PageHeader
-        title="How SmartFeed Logistics Works"
-        subtitle="Moving food from surplus to plate through urgency scoring, split matching, and constraint-based vehicle routing."
+        title="System Architecture & Optimization"
+        subtitle="How SmartFeed routes food from surplus to plate through urgency scoring, split matching, and constraint-based fleet logistics."
         badge={
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800 border border-emerald-200">
-            <Zap className="h-3.5 w-3.5 text-emerald-700" /> System Architecture
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 border border-brand-100 px-2.5 py-0.5 text-xs font-semibold text-brand-700">
+            <Zap className="h-3 w-3 text-brand-500" /> Platform Architecture
           </span>
         }
       />
 
       {/* 4-Step Pipeline */}
       <div>
-        <div className="text-xs font-bold uppercase tracking-wider text-ink-mute mb-3">
+        <div className="text-xs font-semibold uppercase tracking-wider text-ink-soft mb-2.5">
           The 4-Step Autonomous Pipeline
         </div>
-        <ol className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <ol className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
           {[
             {
               n: '1',
@@ -79,13 +79,13 @@ export default function HowItWorks() {
           ].map((st) => (
             <li
               key={st.n}
-              className="card relative p-5 border-slate-200 shadow-sm transition hover:shadow-card-hover"
+              className="card p-4 hover:border-slate-300 hover:shadow-card-hover transition-all"
             >
-              <div className="flex items-center gap-3 mb-2">
-                <span className="grid h-8 w-8 place-items-center rounded-xl bg-leaf-700 font-display text-sm font-bold text-white shadow-sm">
+              <div className="flex items-center gap-2.5 mb-2">
+                <span className="grid h-6 w-6 place-items-center rounded-lg bg-brand-500 text-xs font-bold text-white shadow-sm">
                   {st.n}
                 </span>
-                <b className="font-display text-base font-bold text-ink">{st.t}</b>
+                <span className="text-sm font-semibold text-ink">{st.t}</span>
               </div>
               <p className="text-xs text-ink-soft leading-relaxed">{st.d}</p>
             </li>
@@ -95,10 +95,10 @@ export default function HowItWorks() {
 
       {/* Scoring Formulas */}
       <div>
-        <div className="text-xs font-bold uppercase tracking-wider text-ink-mute mb-3">
+        <div className="text-xs font-semibold uppercase tracking-wider text-ink-soft mb-2.5">
           Mathematical Weighting Formulae
         </div>
-        <div className="grid gap-5 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-2">
           <Formula
             title="Donation Urgency Score (0 to 1)"
             desc="Synthesizes how quickly food will spoil and how easily it can be collected."
@@ -120,65 +120,57 @@ export default function HowItWorks() {
         </div>
       </div>
 
-      {/* Interactive Simulator Sandbox */}
-      <div>
-        <div className="text-xs font-bold uppercase tracking-wider text-ink-mute mb-3">
-          Interactive Parameter Sandbox
-        </div>
-        <UrgencySandbox />
-      </div>
-
       {/* Color Language Reference */}
-      <div className="card p-5 border-slate-200 shadow-sm">
-        <div className="flex items-center gap-2 mb-3">
-          <Scale className="h-4 w-4 text-leaf-700" />
-          <h3 className="font-display text-base font-bold text-ink">Urgency Classification & Color Codes</h3>
+      <div className="card p-5 space-y-3">
+        <div className="flex items-center gap-2">
+          <Scale className="h-4 w-4 text-brand-600" />
+          <h3 className="text-sm font-semibold text-ink">Urgency Classification & Status Badges</h3>
         </div>
         <div className="grid gap-3 sm:grid-cols-3">
-          <div className="rounded-xl border border-rose-200 bg-rose-50/70 p-3.5">
-            <span className="inline-block rounded-full bg-rose-600 px-2.5 py-0.5 text-[11px] font-bold text-white mb-1.5">
-              Urgency ≥ 0.60
+          <div className="rounded-lg border border-urgent-border bg-urgent-soft/40 p-3">
+            <span className="inline-block rounded-full bg-urgent px-2 py-0.5 text-[10px] font-semibold text-white mb-1.5">
+              Score ≥ 0.60
             </span>
-            <div className="font-bold text-rose-950 text-xs">High Urgency</div>
-            <p className="text-[11px] text-rose-800 mt-1">
+            <div className="font-semibold text-urgent text-xs">High Urgency</div>
+            <p className="text-[11px] text-ink-soft mt-1 leading-snug">
               Cooked meals with &lt; 3 hours before expiry, or Level 5 crisis shelter. Dispatched immediately.
             </p>
           </div>
 
-          <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-3.5">
-            <span className="inline-block rounded-full bg-amber-600 px-2.5 py-0.5 text-[11px] font-bold text-white mb-1.5">
-              Urgency 0.40 – 0.59
+          <div className="rounded-lg border border-warning-border bg-warning-soft/40 p-3">
+            <span className="inline-block rounded-full bg-warning px-2 py-0.5 text-[10px] font-semibold text-white mb-1.5">
+              Score 0.40 – 0.59
             </span>
-            <div className="font-bold text-amber-950 text-xs">Medium Urgency</div>
-            <p className="text-[11px] text-amber-800 mt-1">
+            <div className="font-semibold text-warning text-xs">Moderate Urgency</div>
+            <p className="text-[11px] text-ink-soft mt-1 leading-snug">
               Surplus with moderate shelf-life (3–6 hours). Scheduled on upcoming vehicle wave.
             </p>
           </div>
 
-          <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-3.5">
-            <span className="inline-block rounded-full bg-emerald-600 px-2.5 py-0.5 text-[11px] font-bold text-white mb-1.5">
-              Urgency &lt; 0.40
+          <div className="rounded-lg border border-brand-100 bg-brand-50/40 p-3">
+            <span className="inline-block rounded-full bg-brand-500 px-2 py-0.5 text-[10px] font-semibold text-white mb-1.5">
+              Score &lt; 0.40
             </span>
-            <div className="font-bold text-emerald-950 text-xs">Stable / Flexible</div>
-            <p className="text-[11px] text-emerald-800 mt-1">
-              Dry food or raw produce with 12h+ shelf-life. Slotted flexibly into vehicle capacity.
+            <div className="font-semibold text-brand-700 text-xs">Stable / Flexible</div>
+            <p className="text-[11px] text-ink-soft mt-1 leading-snug">
+              Dry rations or raw produce with 12h+ shelf-life. Slotted flexibly into vehicle capacity.
             </p>
           </div>
         </div>
       </div>
 
-      {/* Constraints that make it realistic */}
+      {/* Constraints */}
       <div>
-        <div className="text-xs font-bold uppercase tracking-wider text-ink-mute mb-3">
+        <div className="text-xs font-semibold uppercase tracking-wider text-ink-soft mb-2.5">
           Real-World Logistics Constraints
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {rules.map(([Icon, t, d]) => (
-            <div key={t} className="card p-5 border-slate-200 shadow-sm transition hover:shadow-card-hover">
-              <div className="grid h-10 w-10 place-items-center rounded-xl bg-slate-100 text-leaf-800 mb-3">
-                <Icon className="h-5 w-5" />
+            <div key={t} className="card p-4 hover:border-slate-300 transition-all">
+              <div className="grid h-8 w-8 place-items-center rounded-lg bg-slate-50 border border-line text-brand-600 mb-2.5">
+                <Icon className="h-4 w-4" />
               </div>
-              <b className="font-display text-base font-bold text-ink block">{t}</b>
+              <span className="text-sm font-semibold text-ink block">{t}</span>
               <p className="mt-1 text-xs text-ink-soft leading-relaxed">{d}</p>
             </div>
           ))}
